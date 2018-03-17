@@ -1,7 +1,9 @@
 package com.example.android.project_inventoryapp;
 
+import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -204,14 +206,32 @@ public class EditorActivity extends AppCompatActivity
 
                             // Validate data and display toast message accordingly
                             if (quantityInt < 0) {
-                                Toast.makeText(getApplicationContext(),"Cannot order a negative quantity",
+                                Toast.makeText(getApplicationContext(), "Cannot order a negative quantity",
                                         Toast.LENGTH_SHORT).show();
                             } else if (quantityInt == 0) {
-                                Toast.makeText(getApplicationContext(),"Please choose quantity to order",
+                                Toast.makeText(getApplicationContext(), "Please choose quantity to order",
                                         Toast.LENGTH_SHORT).show();
                             } else {
-                                Toast.makeText(getApplicationContext(),"Ordering " + quantityInt.toString() +
-                                        " more",Toast.LENGTH_SHORT).show();
+                                // Create a final variable that can be referenced in the inner class for the dialog listener
+                                final String displayOrderQuantity = quantityInt.toString();
+
+                                // Input is valid - setup an alert dialog for user to confirm the order.
+                                // Create a click listener to handle the user confirming that changes should be discarded.
+                                DialogInterface.OnClickListener confirmOrderButtonClickListener =
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                // User clicked alert dialog button confirming the order -
+                                                // display toast message confirming the order + quantity.
+                                                // Reset order quantity EditText to zero.
+                                                Toast.makeText(getApplicationContext(), "Ordering " + displayOrderQuantity +
+                                                        " more", Toast.LENGTH_SHORT).show();
+                                                mOrderQuantityEditText.setText("0");
+                                            }
+                                        };
+
+                                // Show dialog to confirm order
+                                showOrderConfirmationDialog(confirmOrderButtonClickListener);
                             }
 
                         } catch (NumberFormatException e) {
@@ -280,6 +300,34 @@ public class EditorActivity extends AppCompatActivity
         mPriceEditText.setText("");
         mQuantityStockedEditText.setText("");
         mOrderQuantityEditText.setText("");
+    }
+
+    /**
+     * Show a dialog that warns the user there are unsaved changes that will be lost
+     * if they continue leaving the editor.
+     *
+     * @param confirmButtonClickListener is the click listener for what to do when
+     *                                   the user confirms they want to order more of the product
+     */
+    private void showOrderConfirmationDialog(DialogInterface.OnClickListener confirmButtonClickListener) {
+        // Create an AlertDialog.Builder and set the message, and click listeners
+        // for the postivie and negative buttons on the dialog.
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are you sure you want to place this order?");
+        builder.setPositiveButton("Yes - place order", confirmButtonClickListener);
+        builder.setNegativeButton("No - not right now", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "No" button, so dismiss the dialog
+                // and continue editing the product.
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     @Override
