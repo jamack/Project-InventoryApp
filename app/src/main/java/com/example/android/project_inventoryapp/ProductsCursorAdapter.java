@@ -3,7 +3,6 @@ package com.example.android.project_inventoryapp;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +42,7 @@ public class ProductsCursorAdapter extends CursorAdapter {
      */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        Log.v(LOG_TAG,"Entering newView method");
+
         // Inflate the list item view
         View listItem = LayoutInflater.from(context).inflate(R.layout.item_stockroom_listview,parent,false);
 
@@ -72,11 +71,10 @@ public class ProductsCursorAdapter extends CursorAdapter {
      */
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        Log.v(LOG_TAG,"Entering bindView method");
+
         // Retrieve tagged ViewHolder object and its cached views
         ViewHolder holder = (ViewHolder) view.getTag();
         TextView tvName = holder.name;
-        Log.v(LOG_TAG,"In bindView method; value of tvName is: " + holder.name);
         TextView tvQuantity = holder.quantity;
         TextView tvPrice = holder.price;
         Button btnSale = holder.saleButton;
@@ -85,9 +83,6 @@ public class ProductsCursorAdapter extends CursorAdapter {
         String cName = cursor.getString(cursor.getColumnIndexOrThrow(ProductContract.ProductEntry.COLUMN_PRODUCT_NAME));
         String cQuantity = cursor.getString(cursor.getColumnIndexOrThrow(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED));
         Integer cPrice = cursor.getInt(cursor.getColumnIndexOrThrow(ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE));
-        Log.v(LOG_TAG,"In bindView method; value of cName is: " + cName);
-        Log.v(LOG_TAG,"In bindView method; value of cQuantity is: " + cQuantity);
-        Log.v(LOG_TAG,"In bindView method; value of cPrice is: " + priceDbToString(cPrice));
 
         // Set data on the textviews
         tvName.setText(cName);
@@ -95,6 +90,7 @@ public class ProductsCursorAdapter extends CursorAdapter {
         tvPrice.setText(priceDbToString(cPrice));
     }
 
+    // TODO: REFACTOR CODE RE: THESE METHODS IF I GET STATIC METHODS IN THE DBHELPER TO WORK...
     private String priceDbToString(int dbPrice) {
         // Database integer represents price in cents.
         // Divide by 100 to get a decimal representing dollars and cents.

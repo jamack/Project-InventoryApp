@@ -86,6 +86,7 @@ implements LoaderManager.LoaderCallbacks<Cursor> {
         mProductsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Log.v(LOG_TAG,"In onCreate method; defining onItemClick method for new OnItemClickListener");
                 //Create an intent
                 Intent intent = new Intent(StockroomActivity.this,EditorActivity.class);
 

@@ -59,4 +59,21 @@ public class ProductDbHelper extends SQLiteOpenHelper {
         // The database is still at version 1, so there's nothing to do be done here.
     }
 
+    public static String priceDbToString(int dbPrice) {
+        // Database integer represents price in cents.
+        // Divide by 100 to get a decimal representing dollars and cents.
+        double priceDollarsCents = dbPrice/100;
+
+        return "$" + Double.toString(priceDollarsCents);
+    }
+
+    public static int priceStringToDb(String stringPrice) {
+        // Parse string to a double, representing price in dollars and cents.
+        double priceDollarsCents = Double.parseDouble(stringPrice);
+
+        int dbPrice = (int) priceDollarsCents * 100;
+
+        return dbPrice;
+    }
+
 }
