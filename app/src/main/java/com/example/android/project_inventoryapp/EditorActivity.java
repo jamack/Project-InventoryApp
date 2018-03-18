@@ -2,25 +2,30 @@ package com.example.android.project_inventoryapp;
 
 import android.app.AlertDialog;
 import android.app.LoaderManager;
+import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.project_inventoryapp.data.ProductContract.ProductEntry;
 import com.example.android.project_inventoryapp.data.ProductDbHelper;
 
-// TODO: ADD ALERT DIALOG TO ORDER BUTTON
+// TODO: PERFORM DATABASE INSERT/UPDATE FOR 'ADD PRODUCT' OR 'EDIT PRODUCT'
 public class EditorActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -80,13 +85,44 @@ public class EditorActivity extends AppCompatActivity
     private Button mDeleteProductButton;
 
     /**
+     * Global variable for the Floating Action Button
+     */
+    private FloatingActionButton mFloatingActionButton;
+
+    /**
      * Constant for Edit Product CursorLoader
      */
     private static final int EDIT_PRODUCT_LOADER = 0;
 
+    /**
+     * Global boolean for whether user has entered/edited any product info
+     */
+    private boolean mProductHasChanged = false;
+
+    /**
+     * OnTouchListener to detect any changes that user makes to product info.
+     * Sets mProductHasChanged to 'true' if any changes are detected.
+     */
+    private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            mProductHasChanged = true;
+            return false;
+        }
+    };
+
+    /**
+     * Constants for ContentValues keys
+     */
+    private static final String KEY_IMAGE = "IMAGE";
+    private static final String KEY_NAME = "NAME";
+    private static final String KEY_PRICE = "PRICE";
+    private static final String KEY_QUANTITY = "QUANTITY";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.v(LOG_TAG,"Entering onCreate method");
         setContentView(R.layout.activity_editor);
 
         // Store references to layout views
@@ -99,7 +135,11 @@ public class EditorActivity extends AppCompatActivity
         mOrderQuantityEditText = findViewById(R.id.editor_quantity_to_order);
         mOrderButton = findViewById(R.id.editor_button_order);
         mDeleteProductButton = findViewById(R.id.editor_button_delete_product_record);
+        mFloatingActionButton = findViewById(R.id.editor_fab);
 
+        // Set text for currency symbol, to allow for localization.
+        TextView currencySymbol = findViewById(R.id.editor_price_currency_symbol);
+        currencySymbol.setText("$");
 
         // Get URI passed with calling Intent. (URI could be null).
         mPassedUri = getIntent().getData();
@@ -117,8 +157,8 @@ public class EditorActivity extends AppCompatActivity
 
             // Add TextEdit hints for a new product
             mNameEditText.setHint("Enter product name");
-            mPriceEditText.setHint("Enter product price (eg: $14.95)");
-            mQuantityStockedEditText.setHint("Enter current quantity");
+            mPriceEditText.setHint("Enter product price (eg: 14.95)");
+            mQuantityStockedEditText.setHint("Enter current quantity (eg: 20");
 
             // Adding a new product, so hide UI elements related to existing products.
             findViewById(R.id.editor_quantity_to_order_container).setVisibility(View.GONE);
@@ -135,10 +175,23 @@ public class EditorActivity extends AppCompatActivity
         super.onResume();
         Log.v(LOG_TAG, "Entering onResume method");
 
+        // Add ontouchlisteners to detect when user enters/revises any product data and set mProductHasChanged to 'true'.
+        // Buttons will also update mProductHasChanged, via the onclicklisteners added below.
+        // Set a listener on each view, to detect any user changes
+        mNameEditText.setOnTouchListener(mTouchListener);
+        mPriceEditText.setOnTouchListener(mTouchListener);
+        mQuantityStockedEditText.setOnTouchListener(mTouchListener);
+        // Check whether activity opened in 'Add Product' or 'Edit Product' mode.
+        // If in 'Edit Product' mode, order quantity field is visible; add listener.
+        mOrderQuantityEditText.setOnTouchListener(mTouchListener);
+
         // Add onclicklistener to 'increase stock quantity' button
         mIncreaseQuantityButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Update mProductHasChanged boolean
+                mProductHasChanged = true;
+
                 // Get entry from current stocked quantity TextEdit. (May be empty!)
                 String quantityString = mQuantityStockedEditText.getText().toString();
 
@@ -164,6 +217,9 @@ public class EditorActivity extends AppCompatActivity
         mDecreaseQuantityButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Update mProductHasChanged boolean
+                mProductHasChanged = true;
+
                 // Get entry from current stocked quantity TextEdit. (May be empty!)
                 String quantityString = mQuantityStockedEditText.getText().toString();
 
@@ -247,7 +303,6 @@ public class EditorActivity extends AppCompatActivity
         // If URI saved in onCreate() is not null, then EditorActivity has been initiated by selection of a product
         // in the StockroomActivity. Delete product button is only displayed in 'Edit Product' mode.
         if (mPassedUri != null) {
-            // TODO: SET UP THE ONCLICK LOGIC FOR THE 'DELETE PRODUCT' BUTTON
             // Add onclicklistener for 'delete product record' button
             mDeleteProductButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -277,6 +332,96 @@ public class EditorActivity extends AppCompatActivity
                 }
             });
         }
+
+        // Add onclicklistener for floating action button (fab)
+        mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Call helper method to collect user input and store in a ContentValues object
+                ContentValues values = collectInput();
+
+                // TODO: CHECK WHETHER IN 'ADD PRODUCT' OR 'EDIT PRODUCT' MODE AND PERFORM DATABASE OPERATION ACCORDINGLY
+                Log.v(LOG_TAG,"In onResume method; setting up listener for FAB and ContentValues has been " +
+                        "successfully returned");
+                if(values == null) {
+                    //Toast.makeText(getApplicationContext(),"Invalid product info - check and try again",Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.v(LOG_TAG,"Value of ContentValues object from collectInput method is: " + values.toString());
+                }
+            }
+        });
+    }
+
+    @Nullable
+    private ContentValues collectInput() {
+        Log.v(LOG_TAG,"Entering collectInput method");
+        // Check whether user has added/edited product info before proceeding.
+        // If not, notify user and return early.
+        if (mProductHasChanged == false) {
+            if (mPassedUri == null) {
+                Toast.makeText(this,"No product info to save",Toast.LENGTH_SHORT).show();
+                return null;
+            } else {
+                Toast.makeText(this,"Make desired edit(s) before saving",Toast.LENGTH_SHORT).show();
+                return null;
+            }
+        }
+
+        // Create new ContentValues object to hold user input
+        ContentValues values = new ContentValues();
+
+        // Retrieve and validate product name.
+        // Name is required - cannot be null or empty.
+        String name = mNameEditText.getText().toString();
+        if (TextUtils.isEmpty(name)) {
+            Toast.makeText(this,"Product name required",Toast.LENGTH_SHORT).show();
+            return null;
+        } else {
+            // If valid name, add to ContentValues
+            values.put(KEY_NAME,name);
+        }
+
+        // Retrieve product price. Validate/format product price, using helper method from database helper class.
+        // Price is required - cannot be null or empty, and must parse into a usable value
+        String priceString = mPriceEditText.getText().toString();
+        int priceInt;
+        if(TextUtils.isEmpty(priceString)) {
+            Toast.makeText(this,"Product price required",Toast.LENGTH_SHORT).show();
+            return null;
+        } else {
+            priceInt = ProductDbHelper.priceStringToDb(priceString);
+            // Check whether helper method has properly parsed the user's input
+            if (priceInt == ProductDbHelper.PRICE_PARSE_FAILURE) {
+                Toast.makeText(this,"Valid price required. (e.g. 14.95)",Toast.LENGTH_SHORT).show();
+                return null;
+            } else {
+                values.put(KEY_PRICE, priceInt);
+            }
+        }
+
+        // Retrieve and validate product stocked quantity.
+        // Quantity must parse into a usable value and must be zero or greater.
+        String quantityString = mQuantityStockedEditText.getText().toString();
+        int quantityInt = 0;
+        if (TextUtils.isEmpty(name)) {
+            Toast.makeText(this,"Stocked quantity required",Toast.LENGTH_SHORT).show();
+            return null;
+        } else {
+            // TODO: COULD POSSIBLY EXTRACT BELOW VALIDATION INTO A SINGLE METHOD TO BE CALLED FROM HERE & IN QUANTITY BUTTON LISTENERS
+            // Confirm whether user input can be parsed into an integer
+            try {
+                quantityInt = Integer.parseInt(quantityString);
+            } catch (NumberFormatException e) {
+                // Notify user that their input is invalid
+                Log.e(LOG_TAG, "Invalid quantity input; cannot parse to integer");
+                Toast.makeText(getApplicationContext(), "Invalid quantity input - please try again", Toast.LENGTH_SHORT).show();
+            }
+
+            // If valid quantity, add to ContentValues
+            values.put(KEY_QUANTITY,quantityInt);
+        }
+
+        return values;
     }
 
     @Override
@@ -317,6 +462,7 @@ public class EditorActivity extends AppCompatActivity
 
         // Set the retrieved values on the UI fields as a starting point for editing the pet
         mNameEditText.setText(cursorName);
+        // TODO: DISPLAY (2) DECIMAL POINTS INSTEAD OF (1)
         mPriceEditText.setText(cursorPriceString);
 
         // Check that quantity stocked is not null
@@ -337,11 +483,10 @@ public class EditorActivity extends AppCompatActivity
     }
 
     /**
-     * Show a dialog that warns the user there are unsaved changes that will be lost
-     * if they continue leaving the editor.
+     * Show a dialog that asks the user to confirm whether they want to order more of the product.
      *
-     * @param confirmButtonClickListener is the click listener for what to do when
-     *                                   the user confirms they want to order more of the product
+     * @param confirmButtonClickListener is the click listener for logic to execute if the user confirms
+     *                                   they want to order more of the product
      */
     private void showOrderConfirmationDialog(DialogInterface.OnClickListener confirmButtonClickListener) {
         // Create an AlertDialog.Builder and set the message, and click listeners
@@ -364,6 +509,12 @@ public class EditorActivity extends AppCompatActivity
         alertDialog.show();
     }
 
+    /**
+     * Show a dialog that asks the user to confirm whether they truly want to delete the product record.
+     *
+     * @param deletionButtonClickListener is the click listener for logic to execute if the user confirms
+     *                                    they want to delete the product record
+     */
     private void showDeletionConfirmationDialog(DialogInterface.OnClickListener deletionButtonClickListener) {
         // Create an AlertDialog.Builder and set the message, and click listeners
         // for the positive and negative buttons on the dialog.
@@ -395,5 +546,10 @@ public class EditorActivity extends AppCompatActivity
         mDecreaseQuantityButton.setOnClickListener(null);
         mOrderButton.setOnClickListener(null);
         mDeleteProductButton.setOnClickListener(null);
+        mFloatingActionButton.setOnClickListener(null);
+        mNameEditText.setOnTouchListener(null);
+        mPriceEditText.setOnTouchListener(null);
+        mQuantityStockedEditText.setOnTouchListener(null);
+        mOrderQuantityEditText.setOnTouchListener(null);
     }
 }

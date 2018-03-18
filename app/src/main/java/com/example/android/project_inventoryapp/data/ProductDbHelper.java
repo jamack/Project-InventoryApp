@@ -3,6 +3,7 @@ package com.example.android.project_inventoryapp.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.example.android.project_inventoryapp.data.ProductContract.ProductEntry;
 
@@ -10,6 +11,11 @@ import com.example.android.project_inventoryapp.data.ProductContract.ProductEntr
  * Database helper for Inventory app. Manages database creation and version management.
  */
 public class ProductDbHelper extends SQLiteOpenHelper {
+
+    /**
+     * Tag for log messages
+     */
+    private static final String LOG_TAG = ProductDbHelper.class.getSimpleName();
 
     /** Name of the database file */
     public static final String DATABASE_NAME = "store.db";
@@ -67,9 +73,21 @@ public class ProductDbHelper extends SQLiteOpenHelper {
         return "$" + Double.toString(priceDollarsCents);
     }
 
+    /**
+     * Constant that signifies failure of priceStringtoDB helper method to properly parse user's input price.
+     */
+    public static final int PRICE_PARSE_FAILURE = -1;
+
     public static int priceStringToDb(String stringPrice) {
-        // Parse string to a double, representing price in dollars and cents.
-        double priceDollarsCents = Double.parseDouble(stringPrice);
+        // Try parsing string to a double, representing price in dollars and cents.
+        double priceDollarsCents;
+        try {
+            priceDollarsCents = Double.parseDouble(stringPrice);
+        } catch (NumberFormatException e) {
+            Log.e(LOG_TAG,"Cannot parse product price into a double");
+            // Return an integer outside valid range to notify calling method of parsing failure
+            return PRICE_PARSE_FAILURE;
+        }
 
         int dbPrice = (int) priceDollarsCents * 100;
 

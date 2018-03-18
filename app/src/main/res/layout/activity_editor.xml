@@ -26,18 +26,36 @@
         android:layout_alignWithParentIfMissing="true"
         android:layout_centerHorizontal="true"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        tools:text="WhamHammer stapler"/>
 
-    <EditText
-        android:id="@+id/editor_price"
-        android:layout_below="@id/editor_name"
+    <LinearLayout
+        android:id="@+id/editor_price_container"
+        android:layout_below="@+id/editor_name"
         android:layout_centerHorizontal="true"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/editor_price_currency_symbol"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="$"/>
+
+        <EditText
+            android:id="@+id/editor_price"
+            android:layout_below="@id/editor_name"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="14.95"/>
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/editor_quantity_stocked_container"
-        android:layout_below="@id/editor_price"
+        android:layout_below="@id/editor_price_container"
         android:layout_centerHorizontal="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -47,7 +65,8 @@
             android:id="@+id/editor_quantity_stocked"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical" />
+            android:layout_gravity="center_vertical"
+            tools:text="3"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
