@@ -243,6 +243,40 @@ public class EditorActivity extends AppCompatActivity
                 }
             });
         }
+
+        // If URI saved in onCreate() is not null, then EditorActivity has been initiated by selection of a product
+        // in the StockroomActivity. Delete product button is only displayed in 'Edit Product' mode.
+        if (mPassedUri != null) {
+            // TODO: SET UP THE ONCLICK LOGIC FOR THE 'DELETE PRODUCT' BUTTON
+            // Add onclicklistener for 'delete product record' button
+            mDeleteProductButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // Create a click listener to handle the user confirming that changes should be discarded.
+                    // This click listener will be passed to an alert dialog for user to confirm deletion of product record.
+                    DialogInterface.OnClickListener confirmDeletionButtonClickListener =
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    // User clicked alert dialog button confirming the deletion - delete product record,
+                                    // return to Stockroom Activity, and display toast message confirming deletion.
+                                    int rowsDeleted = getContentResolver().delete(mPassedUri,null,null);
+                                    if (rowsDeleted == 0) {
+                                        Toast.makeText(getApplicationContext(),"Failed to delete product record",
+                                                Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(getApplicationContext(),"Product record deleted",
+                                                Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    }
+                                }
+                            };
+
+                    // Show dialog to confirm order
+                    showDeletionConfirmationDialog(confirmDeletionButtonClickListener);
+                }
+            });
+        }
     }
 
     @Override
@@ -311,11 +345,32 @@ public class EditorActivity extends AppCompatActivity
      */
     private void showOrderConfirmationDialog(DialogInterface.OnClickListener confirmButtonClickListener) {
         // Create an AlertDialog.Builder and set the message, and click listeners
-        // for the postivie and negative buttons on the dialog.
+        // for the positive and negative buttons on the dialog.
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Are you sure you want to place this order?");
-        builder.setPositiveButton("Yes - place order", confirmButtonClickListener);
-        builder.setNegativeButton("No - not right now", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Place order", confirmButtonClickListener);
+        builder.setNegativeButton("Not right now", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "No" button, so dismiss the dialog
+                // and continue editing the product.
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private void showDeletionConfirmationDialog(DialogInterface.OnClickListener deletionButtonClickListener) {
+        // Create an AlertDialog.Builder and set the message, and click listeners
+        // for the positive and negative buttons on the dialog.
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are you sure you want to delete this product record?");
+        builder.setPositiveButton("Delete record", deletionButtonClickListener);
+        builder.setNegativeButton("Retain record", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked the "No" button, so dismiss the dialog
                 // and continue editing the product.
@@ -339,5 +394,6 @@ public class EditorActivity extends AppCompatActivity
         mIncreaseQuantityButton.setOnClickListener(null);
         mDecreaseQuantityButton.setOnClickListener(null);
         mOrderButton.setOnClickListener(null);
+        mDeleteProductButton.setOnClickListener(null);
     }
 }
