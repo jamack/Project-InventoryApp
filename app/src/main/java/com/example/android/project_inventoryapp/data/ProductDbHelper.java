@@ -7,6 +7,9 @@ import android.util.Log;
 
 import com.example.android.project_inventoryapp.data.ProductContract.ProductEntry;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 /**
  * Database helper for Inventory app. Manages database creation and version management.
  */
@@ -66,11 +69,17 @@ public class ProductDbHelper extends SQLiteOpenHelper {
     }
 
     public static String priceDbToString(int dbPrice) {
+
         // Database integer represents price in cents.
         // Divide by 100 to get a decimal representing dollars and cents.
-        double priceDollarsCents = dbPrice/100;
+        double priceDollarsCents = (double) dbPrice / 100;
 
-        return "$" + Double.toString(priceDollarsCents);
+        // Round to (2) decimal points
+        BigDecimal bd = BigDecimal.valueOf(priceDollarsCents);
+        BigDecimal rounded = bd.setScale(2, RoundingMode.HALF_UP);
+
+        // Convert to a string and return string
+        return rounded.toString();
     }
 
     /**
@@ -79,6 +88,7 @@ public class ProductDbHelper extends SQLiteOpenHelper {
     public static final int PRICE_PARSE_FAILURE = -1;
 
     public static int priceStringToDb(String stringPrice) {
+
         // Try parsing string to a double, representing price in dollars and cents.
         double priceDollarsCents;
         try {
@@ -89,8 +99,10 @@ public class ProductDbHelper extends SQLiteOpenHelper {
             return PRICE_PARSE_FAILURE;
         }
 
-        int dbPrice = (int) priceDollarsCents * 100;
+        // Multiply by 100 to remove the (2) decimal points and store as an integer
+        int dbPrice = (int) (priceDollarsCents * 100);
 
+        // Return the database-friendly integer value
         return dbPrice;
     }
 

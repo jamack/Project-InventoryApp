@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.android.project_inventoryapp.data.ProductContract;
+import com.example.android.project_inventoryapp.data.ProductDbHelper;
 
 /**
  * {@link ProductsCursorAdapter} is an adapter for a list or grid view
@@ -87,25 +88,7 @@ public class ProductsCursorAdapter extends CursorAdapter {
         // Set data on the textviews
         tvName.setText(cName);
         tvQuantity.setText(cQuantity);
-        tvPrice.setText(priceDbToString(cPrice));
-    }
-
-    // TODO: REFACTOR CODE RE: THESE METHODS IF I GET STATIC METHODS IN THE DBHELPER TO WORK...
-    private String priceDbToString(int dbPrice) {
-        // Database integer represents price in cents.
-        // Divide by 100 to get a decimal representing dollars and cents.
-        double priceDollarsCents = dbPrice/100;
-
-        return "$" + Double.toString(priceDollarsCents);
-    }
-
-    private int priceStringToDb(String stringPrice) {
-        // Parse string to a double, representing price in dollars and cents.
-        double priceDollarsCents = Double.parseDouble(stringPrice);
-
-        int dbPrice = (int) priceDollarsCents * 100;
-
-        return dbPrice;
+        tvPrice.setText("$" + ProductDbHelper.priceDbToString(cPrice));
     }
 
     /**

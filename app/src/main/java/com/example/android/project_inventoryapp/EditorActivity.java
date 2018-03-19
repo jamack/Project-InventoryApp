@@ -25,7 +25,7 @@ import android.widget.Toast;
 import com.example.android.project_inventoryapp.data.ProductContract.ProductEntry;
 import com.example.android.project_inventoryapp.data.ProductDbHelper;
 
-// TODO: PERFORM DATABASE INSERT/UPDATE FOR 'ADD PRODUCT' OR 'EDIT PRODUCT'
+// TODO: ADD INTENT TO SEND PRODUCT ORDER INFO TO EMAIL APP
 public class EditorActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -340,13 +340,33 @@ public class EditorActivity extends AppCompatActivity
                 // Call helper method to collect user input and store in a ContentValues object
                 ContentValues values = collectInput();
 
-                // TODO: CHECK WHETHER IN 'ADD PRODUCT' OR 'EDIT PRODUCT' MODE AND PERFORM DATABASE OPERATION ACCORDINGLY
-                Log.v(LOG_TAG,"In onResume method; setting up listener for FAB and ContentValues has been " +
-                        "successfully returned");
-                if(values == null) {
-                    //Toast.makeText(getApplicationContext(),"Invalid product info - check and try again",Toast.LENGTH_SHORT).show();
-                } else {
-                    Log.v(LOG_TAG,"Value of ContentValues object from collectInput method is: " + values.toString());
+                // If URI passed to EditorActivity with starting Intent is null, it's in 'Add Product' mode
+                if (mPassedUri == null) {
+                    // Insert ContentValues object with product data into the database
+                    Uri uri = getContentResolver().insert(ProductEntry.CONTENT_URI,values);
+                    // Check returned URI to see whether database insertion was successful
+                    if (uri == null) {
+                        // Warn user that database insertion failed
+                        Toast.makeText(getApplicationContext(),"Failed to save new product",Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Notify user that database insertion was successful
+                        Toast.makeText(getApplicationContext(),"New product saved",Toast.LENGTH_SHORT).show();
+                        // Return to StockroomActivity
+                        finish();
+                    }
+                } else { // If URI passed to EditorActivity with starting Intent is not null, it's in 'Edit Product' mode
+                    // Update existing database entry - via passed URI - with revised product data in ContentValues object
+                    int rowsUpdated = getContentResolver().update(mPassedUri,values,null,null);
+                    // Check returned integer to see whether database entry update was successful
+                    if (rowsUpdated == 0) {
+                        // Warn user that database update failed
+                        Toast.makeText(getApplicationContext(),"Failed to update product",Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Notify user that database update was successful
+                        Toast.makeText(getApplicationContext(),"Product entry updated",Toast.LENGTH_SHORT).show();
+                        // Return to StockroomActivity
+                        finish();
+                    }
                 }
             }
         });
@@ -378,7 +398,7 @@ public class EditorActivity extends AppCompatActivity
             return null;
         } else {
             // If valid name, add to ContentValues
-            values.put(KEY_NAME,name);
+            values.put(ProductEntry.COLUMN_PRODUCT_NAME,name);
         }
 
         // Retrieve product price. Validate/format product price, using helper method from database helper class.
@@ -395,7 +415,7 @@ public class EditorActivity extends AppCompatActivity
                 Toast.makeText(this,"Valid price required. (e.g. 14.95)",Toast.LENGTH_SHORT).show();
                 return null;
             } else {
-                values.put(KEY_PRICE, priceInt);
+                values.put(ProductEntry.COLUMN_PRODUCT_PRICE, priceInt);
             }
         }
 
@@ -418,7 +438,7 @@ public class EditorActivity extends AppCompatActivity
             }
 
             // If valid quantity, add to ContentValues
-            values.put(KEY_QUANTITY,quantityInt);
+            values.put(ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED,quantityInt);
         }
 
         return values;
@@ -462,7 +482,6 @@ public class EditorActivity extends AppCompatActivity
 
         // Set the retrieved values on the UI fields as a starting point for editing the pet
         mNameEditText.setText(cursorName);
-        // TODO: DISPLAY (2) DECIMAL POINTS INSTEAD OF (1)
         mPriceEditText.setText(cursorPriceString);
 
         // Check that quantity stocked is not null
