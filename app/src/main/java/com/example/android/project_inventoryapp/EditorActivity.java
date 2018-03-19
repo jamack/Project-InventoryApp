@@ -5,7 +5,9 @@ import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -110,14 +112,6 @@ public class EditorActivity extends AppCompatActivity
             return false;
         }
     };
-
-    /**
-     * Constants for ContentValues keys
-     */
-    private static final String KEY_IMAGE = "IMAGE";
-    private static final String KEY_NAME = "NAME";
-    private static final String KEY_PRICE = "PRICE";
-    private static final String KEY_QUANTITY = "QUANTITY";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -277,11 +271,34 @@ public class EditorActivity extends AppCompatActivity
                                         new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialogInterface, int i) {
-                                                // User clicked alert dialog button confirming the order -
-                                                // display toast message confirming the order + quantity.
-                                                // Reset order quantity EditText to zero.
-                                                Toast.makeText(getApplicationContext(), "Ordering " + displayOrderQuantity +
-                                                        " more", Toast.LENGTH_SHORT).show();
+                                                // User clicked alert dialog button confirming the order - Open email-capable app,
+                                                // pre-populated with relevant info to order more of the displayed product.
+
+                                                // Create new email Intent
+                                                Intent intent = new Intent(Intent.ACTION_SENDTO);
+                                                intent.setData(Uri.parse("mailto:"));
+
+                                                // Retrieve product name
+                                                String name = mNameEditText.getText().toString();
+                                                // Check that product name has not been cleared before adding to Intent's subject line.
+                                                if (!TextUtils.isEmpty(name)) {
+                                                    intent.putExtra(Intent.EXTRA_SUBJECT, "Purchase Order: " + name);
+                                                }
+
+                                                // Add body text to email Intent
+                                                intent.putExtra(Intent.EXTRA_TEXT,"Hello,\n\nWe wish to purchase " +
+                                                displayOrderQuantity + " more of your company's " + name + " product.");
+
+                                                //Check that Intent can be resolved and start Intent
+                                                PackageManager packageManager = getApplicationContext().getPackageManager();
+                                                if (intent.resolveActivity(packageManager) != null) {
+                                                    startActivity(intent);
+                                                } else {
+                                                    Toast.makeText(getApplicationContext(), "Cannot locate an appropriate application for sending order",
+                                                            Toast.LENGTH_SHORT).show();
+                                                }
+
+                                                // Reset order quantity to zero
                                                 mOrderQuantityEditText.setText("0");
                                             }
                                         };
