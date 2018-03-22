@@ -1,13 +1,17 @@
 package com.example.android.project_inventoryapp;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.v4.widget.CursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.project_inventoryapp.data.ProductContract;
 import com.example.android.project_inventoryapp.data.ProductDbHelper;
@@ -19,7 +23,9 @@ import com.example.android.project_inventoryapp.data.ProductDbHelper;
  */
 public class ProductsCursorAdapter extends CursorAdapter {
 
-    /** Tag for log messages */
+    /**
+     * Tag for log messages
+     */
     private static final String LOG_TAG = ProductsCursorAdapter.class.getSimpleName();
 
     /**
@@ -45,7 +51,7 @@ public class ProductsCursorAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
 
         // Inflate the list item view
-        View listItem = LayoutInflater.from(context).inflate(R.layout.item_stockroom_listview,parent,false);
+        View listItem = LayoutInflater.from(context).inflate(R.layout.item_stockroom_listview, parent, false);
 
         // Create a new ViewHolder object to cache children views
         ViewHolder holder = new ViewHolder();
@@ -71,7 +77,7 @@ public class ProductsCursorAdapter extends CursorAdapter {
      *                correct row.
      */
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
+    public void bindView(View view, final Context context, final Cursor cursor) {
 
         // Retrieve tagged ViewHolder object and its cached views
         ViewHolder holder = (ViewHolder) view.getTag();
@@ -81,14 +87,59 @@ public class ProductsCursorAdapter extends CursorAdapter {
         Button btnSale = holder.saleButton;
 
         // Get data from cursor
-        String cName = cursor.getString(cursor.getColumnIndexOrThrow(ProductContract.ProductEntry.COLUMN_PRODUCT_NAME));
-        String cQuantity = cursor.getString(cursor.getColumnIndexOrThrow(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED));
-        Integer cPrice = cursor.getInt(cursor.getColumnIndexOrThrow(ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE));
+        final String cName = cursor.getString(cursor.getColumnIndexOrThrow(ProductContract.ProductEntry.COLUMN_PRODUCT_NAME));
+        final Integer cQuantity = cursor.getInt(cursor.getColumnIndexOrThrow(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED));
+        final Integer cPrice = cursor.getInt(cursor.getColumnIndexOrThrow(ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE));
+
+        // Get _id from the cursor. (Will be used if user clicks this item's 'Sale' button).
+        final String cId = cursor.getString(cursor.getColumnIndexOrThrow(ProductContract.ProductEntry._ID));
 
         // Set data on the textviews
         tvName.setText(cName);
-        tvQuantity.setText(cQuantity);
+        tvQuantity.setText(Integer.toString(cQuantity));
         tvPrice.setText("$" + ProductDbHelper.priceDbToString(cPrice));
+
+        // Set up the 'sale' button
+        btnSale.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.v(LOG_TAG, "ListView item button clicked; entering onClick method");
+
+                // Check that quantity will not drop below zero before executing sale logic
+                if (cQuantity > 0) {
+
+                    // Create ContentValues object
+                    ContentValues values = new ContentValues();
+
+                    // Reduce stocked quantity by one and add updated quantity to ContentValues object.
+                    values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED, cQuantity - 1);
+
+                    // Add other current product data back to ContentValues object.
+                    // (Required by ProductProvider's data validation logic).
+                    values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_NAME, cName);
+                    values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE, cPrice);
+                    Log.v(LOG_TAG, "In bindView method; value of readied ContentValues: " + values.toString());
+
+                    // Use the ID to create URI for item's database entry
+                    Uri uri = Uri.withAppendedPath(ProductContract.ProductEntry.CONTENT_URI, cId);
+                    Log.v(LOG_TAG, "In bindView method; updating URI of: " + uri);
+
+                    // Perform database update operation, passing in ContentValues object
+                    int rowsUpdated = context.getContentResolver().update(uri, values, null, null);
+
+                    // Check whether database operation was successful. Warn user if operation failed.
+                    if (rowsUpdated == 0) {
+                        Toast.makeText(context, "Failed to update product", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.v(LOG_TAG, "In bindView method's listener setup; successfully updated " + Integer.toString(rowsUpdated) + " rows.");
+                        Log.v(LOG_TAG, "In bindView method; after database update, value of cQuantityInt is: " + Integer.toString(cQuantity - 1));
+                    }
+                } else { // Quantity is already zero
+                    // TODO: CREATE ALERTDIALOG TO ALERT USER THAT PRODUCT IS OUT OF STOCK, ASK TO ORDER MORE, & ORDER MORE?
+                    Toast.makeText(context, "Product is already sold out", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     /**

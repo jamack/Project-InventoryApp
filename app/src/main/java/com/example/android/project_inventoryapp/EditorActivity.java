@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -27,7 +28,7 @@ import android.widget.Toast;
 import com.example.android.project_inventoryapp.data.ProductContract.ProductEntry;
 import com.example.android.project_inventoryapp.data.ProductDbHelper;
 
-// TODO: ADD INTENT TO SEND PRODUCT ORDER INFO TO EMAIL APP
+// TODO: ADD IMAGE FUNCTIONALITY
 public class EditorActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -484,9 +485,25 @@ public class EditorActivity extends AppCompatActivity
         cursor.moveToFirst();
 
         // Retrieve values from the selected product's database entry
+        byte[] cursorImage = cursor.getBlob(cursor.getColumnIndexOrThrow(ProductEntry.COLUMN_PRODUCT_IMAGE));
         String cursorName = cursor.getString(cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_NAME));
         Integer cursorPriceInteger = cursor.getInt(cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_PRICE));
         String cursorPriceString = null;
+
+        // Check whether product has an associated image in the database.
+        // (Value in database entry's image column is neither null nor empty).
+        if (cursorImage != null && cursorImage.length != 0) {
+
+            // Make product ImageView visible
+            mImageView.setVisibility(View.VISIBLE);
+
+            // Decode the cursor's byte array / blob back into an image
+            Bitmap bitmap = ProductDbHelper.getImage(cursorImage);
+
+            // Set the retrieved image on the product image view
+            mImageView.setImageBitmap(bitmap);
+        }
+
         // Check that price is not null
         if (cursorPriceInteger != null) {
             // Call helper method in database helper class to format price as a string and overwrite the stored null value
@@ -588,4 +605,5 @@ public class EditorActivity extends AppCompatActivity
         mQuantityStockedEditText.setOnTouchListener(null);
         mOrderQuantityEditText.setOnTouchListener(null);
     }
+
 }

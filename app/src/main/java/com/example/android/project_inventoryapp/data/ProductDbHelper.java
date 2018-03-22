@@ -3,10 +3,13 @@ package com.example.android.project_inventoryapp.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.example.android.project_inventoryapp.data.ProductContract.ProductEntry;
 
+import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -68,6 +71,13 @@ public class ProductDbHelper extends SQLiteOpenHelper {
         // The database is still at version 1, so there's nothing to do be done here.
     }
 
+    /**
+     * Static helper method to translate price (in cents) from database integer
+     * to a string with dollars and cents (2 decimal places). "$" symbol not included.
+     *
+     * @param dbPrice integer value from database
+     * @return string formatted for dollars and cents - e.g. 19.99
+     */
     public static String priceDbToString(int dbPrice) {
 
         // Database integer represents price in cents.
@@ -87,6 +97,13 @@ public class ProductDbHelper extends SQLiteOpenHelper {
      */
     public static final int PRICE_PARSE_FAILURE = -1;
 
+    /**
+     * Static helper method to translate price from string of dollars and cents
+     * to an integer value that can be used by the database's price column.
+     *
+     * @param stringPrice string with dollars and cents, 2 decimal points, no '$' symbol - e.g. 19.99
+     * @return integer price, reflecting just cents - e.g. 1999
+     */
     public static int priceStringToDb(String stringPrice) {
 
         // Try parsing string to a double, representing price in dollars and cents.
@@ -104,6 +121,18 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 
         // Return the database-friendly integer value
         return dbPrice;
+    }
+
+    // convert from bitmap to byte array
+    public static byte[] getBytes(Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
+        return stream.toByteArray();
+    }
+
+    // convert from byte array to bitmap
+    public static Bitmap getImage(byte[] image) {
+        return BitmapFactory.decodeByteArray(image, 0, image.length);
     }
 
 }

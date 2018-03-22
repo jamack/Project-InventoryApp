@@ -43,7 +43,7 @@ implements LoaderManager.LoaderCallbacks<Cursor> {
 
 
 
-        // ** TESTING DATABASE HELPER METHOD **
+//        // ** TESTING DATABASE HELPER METHOD **
 //        ProductDbHelper dbHelper = new ProductDbHelper(this);
 //        SQLiteDatabase database = dbHelper.getReadableDatabase();
 //
@@ -54,13 +54,32 @@ implements LoaderManager.LoaderCallbacks<Cursor> {
 //                ProductContract.CONTENT_AUTHORITY + ProductContract.ProductEntry.TABLE_NAME);
 //        ContentValues contentValues = new ContentValues();
 //        contentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_NAME, "Acme WhamHammer Stapler");
+//        contentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED, 100);
+//        contentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE,1995);
+//
+////        BitmapDrawable bitmapDrawable = (BitmapDrawable) getDrawable(R.drawable.red_stapler);
+////        Bitmap bitmap = bitmapDrawable.getBitmap();
+////        byte[] image = ProductDbHelper.getBytes(bitmap);
+//
+//        Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(),
+//                R.drawable.red_stapler);
+//        byte[] image = ProductDbHelper.getBytes(bitmap);
+//
+//        contentValues.put(ProductEntry.COLUMN_PRODUCT_IMAGE,image);
+//
+//        getContentResolver().insert(insertUri,contentValues);
+//
+//        // insert additional products(s)
+//        contentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_NAME, "Bob's Best Wackadoodle");
+//        contentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED, 20);
+//        contentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE,99);
+//
+//        getContentResolver().insert(insertUri,contentValues);
+
+//        contentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_NAME, "A1 Sice-n-Dice Papercutter");
 //        contentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED, 1);
-//        contentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE,1991);
+//        contentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE,1495);
 //
-//        getContentResolver().insert(insertUri,contentValues);
-//
-//        // insert additional pet(s)
-//        getContentResolver().insert(insertUri,contentValues);
 //        getContentResolver().insert(insertUri,contentValues);
 
 
@@ -81,7 +100,6 @@ implements LoaderManager.LoaderCallbacks<Cursor> {
         // Set adapter on the ListView
         mProductsListView.setAdapter(mCursorAdapter);
 
-        // TODO: ENSURE THAT THIS ISN'T TRIGGERED WHEN THE 'SALE' BUTTON IS PRESSED... (REFERENCE MIWOK APP...)
         // Create a listener for when an item in the list view is selected
         mProductsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
