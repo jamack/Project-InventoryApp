@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -28,7 +29,8 @@ import android.widget.Toast;
 import com.example.android.project_inventoryapp.data.ProductContract.ProductEntry;
 import com.example.android.project_inventoryapp.data.ProductDbHelper;
 
-// TODO: ADD IMAGE FUNCTIONALITY
+import java.io.IOException;
+
 public class EditorActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -41,6 +43,21 @@ public class EditorActivity extends AppCompatActivity
      * URI for specific pet entry, IF editing existing pet
      */
     private Uri mPassedUri;
+
+    /**
+     * Global variable for button to add product image.
+     */
+    private Button mAddImageButton;
+
+    /**
+     * Constant for add image button - choose existing image intent response code
+     */
+    private static final int INTENT_CHOOSE_IMAGE = 0;
+
+    /**
+     * Global variable for product image bitmap. Initially null.
+     */
+    private Bitmap mImageBitmap = null;
 
     /**
      * Global variable for product image ImageView
@@ -117,10 +134,11 @@ public class EditorActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.v(LOG_TAG,"Entering onCreate method");
+        Log.v(LOG_TAG, "Entering onCreate method");
         setContentView(R.layout.activity_editor);
 
         // Store references to layout views
+        mAddImageButton = findViewById(R.id.editor_button_add_image);
         mImageView = findViewById(R.id.editor_image);
         mNameEditText = findViewById(R.id.editor_name);
         mPriceEditText = findViewById(R.id.editor_price);
@@ -149,6 +167,9 @@ public class EditorActivity extends AppCompatActivity
             getLoaderManager().initLoader(EDIT_PRODUCT_LOADER, null, this);
         } else { // if URI is null, then EditorActivity has been initiated by StockroomActivity 'add product' fab
             setTitle("Add Product");
+
+            // Make 'add product image' button visible
+            mAddImageButton.setVisibility(View.VISIBLE);
 
             // Add TextEdit hints for a new product
             mNameEditText.setHint("Enter product name");
@@ -179,6 +200,26 @@ public class EditorActivity extends AppCompatActivity
         // Check whether activity opened in 'Add Product' or 'Edit Product' mode.
         // If in 'Edit Product' mode, order quantity field is visible; add listener.
         mOrderQuantityEditText.setOnTouchListener(mTouchListener);
+
+        // If URI saved in onCreate() is null, then EditorActivity has been initiated by Floating Action Button
+        // in the StockroomActivity. Add product image button is only displayed in 'Add Product' mode.
+        if (mPassedUri == null) {
+            Log.v(LOG_TAG, "In onResume method; about to add onclicklistener");
+            // Add onclicklistener to 'add product image' button
+            mAddImageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.v(LOG_TAG, "Add Image button click has been detected - entering onClick method");
+                    Intent pickImage = new Intent(Intent.ACTION_PICK,
+                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    // Check that Intent can be resolved and start Intent
+                    PackageManager packageManager = getApplicationContext().getPackageManager();
+                    if (pickImage.resolveActivity(packageManager) != null) {
+                        startActivityForResult(pickImage, INTENT_CHOOSE_IMAGE);
+                    }
+                }
+            });
+        }
 
         // Add onclicklistener to 'increase stock quantity' button
         mIncreaseQuantityButton.setOnClickListener(new View.OnClickListener() {
@@ -287,8 +328,8 @@ public class EditorActivity extends AppCompatActivity
                                                 }
 
                                                 // Add body text to email Intent
-                                                intent.putExtra(Intent.EXTRA_TEXT,"Hello,\n\nWe wish to purchase " +
-                                                displayOrderQuantity + " more of your company's " + name + " product.");
+                                                intent.putExtra(Intent.EXTRA_TEXT, "Hello,\n\nWe wish to purchase " +
+                                                        displayOrderQuantity + " more of your company's " + name + " product.");
 
                                                 //Check that Intent can be resolved and start Intent
                                                 PackageManager packageManager = getApplicationContext().getPackageManager();
@@ -333,12 +374,12 @@ public class EditorActivity extends AppCompatActivity
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     // User clicked alert dialog button confirming the deletion - delete product record,
                                     // return to Stockroom Activity, and display toast message confirming deletion.
-                                    int rowsDeleted = getContentResolver().delete(mPassedUri,null,null);
+                                    int rowsDeleted = getContentResolver().delete(mPassedUri, null, null);
                                     if (rowsDeleted == 0) {
-                                        Toast.makeText(getApplicationContext(),"Failed to delete product record",
+                                        Toast.makeText(getApplicationContext(), "Failed to delete product record",
                                                 Toast.LENGTH_SHORT).show();
                                     } else {
-                                        Toast.makeText(getApplicationContext(),"Product record deleted",
+                                        Toast.makeText(getApplicationContext(), "Product record deleted",
                                                 Toast.LENGTH_SHORT).show();
                                         finish();
                                     }
@@ -361,27 +402,27 @@ public class EditorActivity extends AppCompatActivity
                 // If URI passed to EditorActivity with starting Intent is null, it's in 'Add Product' mode
                 if (mPassedUri == null) {
                     // Insert ContentValues object with product data into the database
-                    Uri uri = getContentResolver().insert(ProductEntry.CONTENT_URI,values);
+                    Uri uri = getContentResolver().insert(ProductEntry.CONTENT_URI, values);
                     // Check returned URI to see whether database insertion was successful
                     if (uri == null) {
                         // Warn user that database insertion failed
-                        Toast.makeText(getApplicationContext(),"Failed to save new product",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Failed to save new product", Toast.LENGTH_SHORT).show();
                     } else {
                         // Notify user that database insertion was successful
-                        Toast.makeText(getApplicationContext(),"New product saved",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "New product saved", Toast.LENGTH_SHORT).show();
                         // Return to StockroomActivity
                         finish();
                     }
                 } else { // If URI passed to EditorActivity with starting Intent is not null, it's in 'Edit Product' mode
                     // Update existing database entry - via passed URI - with revised product data in ContentValues object
-                    int rowsUpdated = getContentResolver().update(mPassedUri,values,null,null);
+                    int rowsUpdated = getContentResolver().update(mPassedUri, values, null, null);
                     // Check returned integer to see whether database entry update was successful
                     if (rowsUpdated == 0) {
                         // Warn user that database update failed
-                        Toast.makeText(getApplicationContext(),"Failed to update product",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Failed to update product", Toast.LENGTH_SHORT).show();
                     } else {
                         // Notify user that database update was successful
-                        Toast.makeText(getApplicationContext(),"Product entry updated",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Product entry updated", Toast.LENGTH_SHORT).show();
                         // Return to StockroomActivity
                         finish();
                     }
@@ -392,15 +433,15 @@ public class EditorActivity extends AppCompatActivity
 
     @Nullable
     private ContentValues collectInput() {
-        Log.v(LOG_TAG,"Entering collectInput method");
+        Log.v(LOG_TAG, "Entering collectInput method");
         // Check whether user has added/edited product info before proceeding.
         // If not, notify user and return early.
         if (mProductHasChanged == false) {
             if (mPassedUri == null) {
-                Toast.makeText(this,"No product info to save",Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "No product info to save", Toast.LENGTH_SHORT).show();
                 return null;
             } else {
-                Toast.makeText(this,"Make desired edit(s) before saving",Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Make desired edit(s) before saving", Toast.LENGTH_SHORT).show();
                 return null;
             }
         }
@@ -408,29 +449,40 @@ public class EditorActivity extends AppCompatActivity
         // Create new ContentValues object to hold user input
         ContentValues values = new ContentValues();
 
+        // Check whether an image has been set for the product
+        if (mImageBitmap != null) {
+
+            // Convert image bitmap into byte array that can be saved into database's blob data type,
+            // using helper method in database helper class.
+            byte[] imageByteArray = ProductDbHelper.getBytes(mImageBitmap);
+
+            // Add converted image to ContentValues
+            values.put(ProductEntry.COLUMN_PRODUCT_IMAGE, imageByteArray);
+        }
+
         // Retrieve and validate product name.
         // Name is required - cannot be null or empty.
         String name = mNameEditText.getText().toString();
         if (TextUtils.isEmpty(name)) {
-            Toast.makeText(this,"Product name required",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Product name required", Toast.LENGTH_SHORT).show();
             return null;
         } else {
             // If valid name, add to ContentValues
-            values.put(ProductEntry.COLUMN_PRODUCT_NAME,name);
+            values.put(ProductEntry.COLUMN_PRODUCT_NAME, name);
         }
 
         // Retrieve product price. Validate/format product price, using helper method from database helper class.
         // Price is required - cannot be null or empty, and must parse into a usable value
         String priceString = mPriceEditText.getText().toString();
         int priceInt;
-        if(TextUtils.isEmpty(priceString)) {
-            Toast.makeText(this,"Product price required",Toast.LENGTH_SHORT).show();
+        if (TextUtils.isEmpty(priceString)) {
+            Toast.makeText(this, "Product price required", Toast.LENGTH_SHORT).show();
             return null;
         } else {
             priceInt = ProductDbHelper.priceStringToDb(priceString);
             // Check whether helper method has properly parsed the user's input
             if (priceInt == ProductDbHelper.PRICE_PARSE_FAILURE) {
-                Toast.makeText(this,"Valid price required. (e.g. 14.95)",Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Valid price required. (e.g. 14.95)", Toast.LENGTH_SHORT).show();
                 return null;
             } else {
                 values.put(ProductEntry.COLUMN_PRODUCT_PRICE, priceInt);
@@ -442,7 +494,7 @@ public class EditorActivity extends AppCompatActivity
         String quantityString = mQuantityStockedEditText.getText().toString();
         int quantityInt = 0;
         if (TextUtils.isEmpty(name)) {
-            Toast.makeText(this,"Stocked quantity required",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Stocked quantity required", Toast.LENGTH_SHORT).show();
             return null;
         } else {
             // TODO: COULD POSSIBLY EXTRACT BELOW VALIDATION INTO A SINGLE METHOD TO BE CALLED FROM HERE & IN QUANTITY BUTTON LISTENERS
@@ -456,7 +508,7 @@ public class EditorActivity extends AppCompatActivity
             }
 
             // If valid quantity, add to ContentValues
-            values.put(ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED,quantityInt);
+            values.put(ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED, quantityInt);
         }
 
         return values;
@@ -486,6 +538,7 @@ public class EditorActivity extends AppCompatActivity
 
         // Retrieve values from the selected product's database entry
         byte[] cursorImage = cursor.getBlob(cursor.getColumnIndexOrThrow(ProductEntry.COLUMN_PRODUCT_IMAGE));
+        Log.v(LOG_TAG, "In onLoadFinished method; blob for product image has a null value");
         String cursorName = cursor.getString(cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_NAME));
         Integer cursorPriceInteger = cursor.getInt(cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_PRICE));
         String cursorPriceString = null;
@@ -498,10 +551,10 @@ public class EditorActivity extends AppCompatActivity
             mImageView.setVisibility(View.VISIBLE);
 
             // Decode the cursor's byte array / blob back into an image
-            Bitmap bitmap = ProductDbHelper.getImage(cursorImage);
+            mImageBitmap = ProductDbHelper.getImage(cursorImage);
 
             // Set the retrieved image on the product image view
-            mImageView.setImageBitmap(bitmap);
+            mImageView.setImageBitmap(mImageBitmap);
         }
 
         // Check that price is not null
@@ -589,12 +642,53 @@ public class EditorActivity extends AppCompatActivity
         alertDialog.show();
     }
 
+    protected void onActivityResult(int requestCode, int resultCode, Intent returnedIntent) {
+        super.onActivityResult(requestCode, resultCode, returnedIntent);
+        switch (requestCode) {
+            case INTENT_CHOOSE_IMAGE:
+                if (resultCode == RESULT_OK) {
+                    // Retrieve URI for selected image
+                    Uri selectedImage = returnedIntent.getData();
+
+                    // Ensure the product image view is visible
+                    mImageView.setVisibility(View.VISIBLE);
+
+                    // Get image in bitmap format from the URI
+                    try {
+                        Bitmap rawBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+                        mImageBitmap = ProductDbHelper.sizeImageForDb(rawBitmap);
+                    } catch (IOException e) {
+                        // Notify user that image selection has failed
+                        Toast.makeText(getApplicationContext(), "Failed to add image", Toast.LENGTH_SHORT).show();
+                        Log.e(LOG_TAG, "Error processing camera photo into local bitmap", e);
+                    }
+
+                    // Set selected image on the image view
+                    mImageView.setImageBitmap(mImageBitmap);
+
+                    // Since image has been selected, turn the 'add image' button off
+                    mAddImageButton.setVisibility(View.GONE);
+
+                    // Update mProductHasChanged boolean
+                    mProductHasChanged = true;
+                }
+
+                break;
+
+            default:
+                Toast.makeText(getApplicationContext(),"Unable to perform image selection",Toast.LENGTH_SHORT).show();
+                break;
+
+        }
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
         Log.v(LOG_TAG, "Entering onStop method");
 
         // Release resources
+        mAddImageButton.setOnClickListener(null);
         mIncreaseQuantityButton.setOnClickListener(null);
         mDecreaseQuantityButton.setOnClickListener(null);
         mOrderButton.setOnClickListener(null);

@@ -23,6 +23,11 @@ public class ProductDbHelper extends SQLiteOpenHelper {
      */
     private static final String LOG_TAG = ProductDbHelper.class.getSimpleName();
 
+    /**
+     * Constant for desired maximum image height, in dpi
+     */
+    public static final int MAXIMUM_IMAGE_HEIGHT = 640;
+
     /** Name of the database file */
     public static final String DATABASE_NAME = "store.db";
 
@@ -123,7 +128,35 @@ public class ProductDbHelper extends SQLiteOpenHelper {
         return dbPrice;
     }
 
-    // convert from bitmap to byte array
+    public static Bitmap sizeImageForDb(Bitmap startingBitmap) {
+        // Get starting height and width
+        int initialHeight = startingBitmap.getHeight();
+        int initialWidth = startingBitmap.getWidth();
+
+        // Check whether image height is greater than desired maximum value, based on xxxhdpi density of 640 dpi.
+        // Desired maximum height (in dp) and maximum targeted density - are stored as constants in this class.
+        if (initialHeight > MAXIMUM_IMAGE_HEIGHT) {
+
+            // Calculate the initial width-to-height ratio
+            double ratio = (double) initialWidth / (double) initialHeight;
+
+            int calculatedWidth = new Double(MAXIMUM_IMAGE_HEIGHT * ratio).intValue();
+            Log.v(LOG_TAG, "In sizeImageForDb method; calculating integer calculatedWidth from Double. Value is: " + Integer.toString(calculatedWidth));
+
+            // Scale bitmap to preset height
+            return Bitmap.createScaledBitmap(startingBitmap, calculatedWidth, MAXIMUM_IMAGE_HEIGHT, false);
+        } else {
+            return startingBitmap;
+        }
+    }
+
+    /**
+     * Static helper method to convert a bitmap image into a byte array
+     * that can be saved into the database's blob data type
+     *
+     * @param bitmap image to be saved
+     * @return converted image in byte array format
+     */
     public static byte[] getBytes(Bitmap bitmap) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
@@ -131,8 +164,16 @@ public class ProductDbHelper extends SQLiteOpenHelper {
     }
 
     // convert from byte array to bitmap
-    public static Bitmap getImage(byte[] image) {
-        return BitmapFactory.decodeByteArray(image, 0, image.length);
+
+    /**
+     * Static helper method to convert an image stored as byte array
+     * in database's blob data type into displayable bitmap format
+     *
+     * @param imageByteArray image stored as byte array
+     * @return converted image in bitmap format
+     */
+    public static Bitmap getImage(byte[] imageByteArray) {
+        return BitmapFactory.decodeByteArray(imageByteArray, 0, imageByteArray.length);
     }
 
 }
