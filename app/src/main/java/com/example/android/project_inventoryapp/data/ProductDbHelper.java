@@ -141,7 +141,6 @@ public class ProductDbHelper extends SQLiteOpenHelper {
             double ratio = (double) initialWidth / (double) initialHeight;
 
             int calculatedWidth = new Double(MAXIMUM_IMAGE_HEIGHT * ratio).intValue();
-            Log.v(LOG_TAG, "In sizeImageForDb method; calculating integer calculatedWidth from Double. Value is: " + Integer.toString(calculatedWidth));
 
             // Scale bitmap to preset height
             return Bitmap.createScaledBitmap(startingBitmap, calculatedWidth, MAXIMUM_IMAGE_HEIGHT, false);

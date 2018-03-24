@@ -1,11 +1,12 @@
 package com.example.android.project_inventoryapp;
 
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.widget.CursorAdapter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +14,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.android.project_inventoryapp.data.ProductContract;
+import com.example.android.project_inventoryapp.data.ProductContract.ProductEntry;
 import com.example.android.project_inventoryapp.data.ProductDbHelper;
 
 /**
@@ -87,56 +88,62 @@ public class ProductsCursorAdapter extends CursorAdapter {
         Button btnSale = holder.saleButton;
 
         // Get data from cursor
-        final String cName = cursor.getString(cursor.getColumnIndexOrThrow(ProductContract.ProductEntry.COLUMN_PRODUCT_NAME));
-        final Integer cQuantity = cursor.getInt(cursor.getColumnIndexOrThrow(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED));
-        final Integer cPrice = cursor.getInt(cursor.getColumnIndexOrThrow(ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE));
+        final String cName = cursor.getString(cursor.getColumnIndexOrThrow(ProductEntry.COLUMN_PRODUCT_NAME));
+        final Integer cQuantity = cursor.getInt(cursor.getColumnIndexOrThrow(ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED));
+        final Integer cPrice = cursor.getInt(cursor.getColumnIndexOrThrow(ProductEntry.COLUMN_PRODUCT_PRICE));
 
         // Get _id from the cursor. (Will be used if user clicks this item's 'Sale' button).
-        final String cId = cursor.getString(cursor.getColumnIndexOrThrow(ProductContract.ProductEntry._ID));
+        final String cId = cursor.getString(cursor.getColumnIndexOrThrow(ProductEntry._ID));
 
         // Set data on the textviews
         tvName.setText(cName);
         tvQuantity.setText(Integer.toString(cQuantity));
-        tvPrice.setText("$" + ProductDbHelper.priceDbToString(cPrice));
+        tvPrice.setText(R.string.currency_symbol_dollar_sign );
+        tvPrice.append(ProductDbHelper.priceDbToString(cPrice));
 
         // Set up the 'sale' button
         btnSale.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.v(LOG_TAG, "ListView item button clicked; entering onClick method");
 
                 // Check that quantity will not drop below zero before executing sale logic
                 if (cQuantity > 0) {
+
+                    // Create local variable to hold new value
+                    int updatedQuantity = cQuantity - 1;
 
                     // Create ContentValues object
                     ContentValues values = new ContentValues();
 
                     // Reduce stocked quantity by one and add updated quantity to ContentValues object.
-                    values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED, cQuantity - 1);
+                    values.put(ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED, updatedQuantity);
 
                     // Add other current product data back to ContentValues object.
                     // (Required by ProductProvider's data validation logic).
-                    values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_NAME, cName);
-                    values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE, cPrice);
-                    Log.v(LOG_TAG, "In bindView method; value of readied ContentValues: " + values.toString());
+                    values.put(ProductEntry.COLUMN_PRODUCT_NAME, cName);
+                    values.put(ProductEntry.COLUMN_PRODUCT_PRICE, cPrice);
 
                     // Use the ID to create URI for item's database entry
-                    Uri uri = Uri.withAppendedPath(ProductContract.ProductEntry.CONTENT_URI, cId);
-                    Log.v(LOG_TAG, "In bindView method; updating URI of: " + uri);
+                    Uri uri = Uri.withAppendedPath(ProductEntry.CONTENT_URI, cId);
 
                     // Perform database update operation, passing in ContentValues object
                     int rowsUpdated = context.getContentResolver().update(uri, values, null, null);
 
                     // Check whether database operation was successful. Warn user if operation failed.
                     if (rowsUpdated == 0) {
-                        Toast.makeText(context, "Failed to update product", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Log.v(LOG_TAG, "In bindView method's listener setup; successfully updated " + Integer.toString(rowsUpdated) + " rows.");
-                        Log.v(LOG_TAG, "In bindView method; after database update, value of cQuantityInt is: " + Integer.toString(cQuantity - 1));
+                        Toast.makeText(context, R.string.message_error_failed_to_update_product, Toast.LENGTH_SHORT).show();
+                        // Return early
+                        return;
+                    }
+
+                    // TODO: CREATE ALERTDIALOG TO ALERT USER THAT PRODUCT IS OUT OF STOCK, ASK TO ORDER MORE, & ORDER MORE?
+                    // If quantity reduced to zero, alert user and provide option to order more
+                    if (updatedQuantity == 0) {
+                        Toast.makeText(context, R.string.message_notice_product_sold_out, Toast.LENGTH_SHORT).show();
                     }
                 } else { // Quantity is already zero
                     // TODO: CREATE ALERTDIALOG TO ALERT USER THAT PRODUCT IS OUT OF STOCK, ASK TO ORDER MORE, & ORDER MORE?
-                    Toast.makeText(context, "Product is already sold out", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, R.string.message_notice_product_sold_out, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -151,5 +158,55 @@ public class ProductsCursorAdapter extends CursorAdapter {
         TextView quantity;
         TextView price;
         Button saleButton;
+    }
+
+    // TODO: FINISH THIS ONCLICKLISTENER AND THE SHOWORDERCONFIRMATIONDIALOG METHOD BELOW
+    // Create a click listener to handle the user choosing to order more product.
+    DialogInterface.OnClickListener confirmOrderButtonClickListener =
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    // User clicked alert dialog button choosing to order more of the product -
+                    // set up an Intent to open product in EditorActivity, with its order functionality.
+
+//                    //Create an intent
+//                    Intent intent = new Intent(mContext,EditorActivity.class);
+//
+//                    // Construct a URI for a single database row, using the clicked item's ID
+//                    Uri uri = ContentUris.withAppendedId(ProductEntry.CONTENT_URI,cId);
+//
+//                    // Attach the URI to the intent
+//                    intent.setData(uri);
+//
+//                    // Start the new activity intent
+//                    startActivity(intent);
+
+                }
+            };
+
+    /**
+     * Show a dialog that asks the user to confirm whether they'd like to order more of the product.
+     *
+     * @param confirmButtonClickListener is the click listener for logic to execute if the user confirms
+     *                                   they want to order more of the product
+     */
+    private void showOrderConfirmationDialog(DialogInterface.OnClickListener confirmButtonClickListener) {
+        // Create an AlertDialog.Builder and set the message, and click listeners
+        // for the positive and negative buttons on the dialog.
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        builder.setMessage(R.string.message_notice_product_sold_out);
+        builder.setPositiveButton(R.string.dialog_option_order_more, confirmButtonClickListener);
+        builder.setNegativeButton(R.string.dialog_option_not_right_now, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "No" button, so dismiss the dialog
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 }

@@ -33,7 +33,6 @@ import com.example.android.project_inventoryapp.data.ProductDbHelper;
 
 import java.io.IOException;
 
-// TODO: ADD BACK BUTTON, CHECK FOR UNSAVED CHANGES, & HANDLE VIA ALERTDIALOG
 public class EditorActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -41,82 +40,66 @@ public class EditorActivity extends AppCompatActivity
      * Tag for log messages
      */
     private static final String LOG_TAG = EditorActivity.class.getSimpleName();
-
-    /**
-     * URI for specific pet entry, IF editing existing pet
-     */
-    private Uri mPassedUri;
-
-    /**
-     * Global variable for button to add product image.
-     */
-    private Button mAddImageButton;
-
     /**
      * Constant for add image button - choose existing image intent response code
      */
     private static final int INTENT_CHOOSE_IMAGE = 0;
-
-    /**
-     * Global variable for product image bitmap. Initially null.
-     */
-    private Bitmap mImageBitmap = null;
-
-    /**
-     * Global variable for product image ImageView
-     */
-    private ImageView mImageView;
-
-    /**
-     * Global variable for product name EditText
-     */
-    private EditText mNameEditText;
-
-    /**
-     * Global variable for product price TextView
-     */
-    private EditText mPriceEditText;
-
-    /**
-     * Global variable for stocked quantity TextView
-     */
-    private EditText mQuantityStockedEditText;
-
-    /**
-     * Global variable for increase quantity Button
-     */
-    private Button mIncreaseQuantityButton;
-
-    /**
-     * Global variable for decrease quantity Button
-     */
-    private Button mDecreaseQuantityButton;
-
-    /**
-     * Global variable for order quantity EditText
-     */
-    private EditText mOrderQuantityEditText;
-
-    /**
-     * Global variable for order Button
-     */
-    private Button mOrderButton;
-
-    /**
-     * Global variable for delete product record Button
-     */
-    private Button mDeleteProductButton;
-
-    /**
-     * Global variable for the Floating Action Button
-     */
-    private FloatingActionButton mFloatingActionButton;
-
     /**
      * Constant for Edit Product CursorLoader
      */
     private static final int EDIT_PRODUCT_LOADER = 0;
-
+    /**
+     * URI for specific pet entry, IF editing existing pet
+     */
+    private Uri mPassedUri;
+    /**
+     * Global variable for button to add product image.
+     */
+    private Button mAddImageButton;
+    /**
+     * Global variable for product image bitmap. Initially null.
+     */
+    private Bitmap mImageBitmap = null;
+    /**
+     * Global variable for product image ImageView
+     */
+    private ImageView mImageView;
+    /**
+     * Global variable for product name EditText
+     */
+    private EditText mNameEditText;
+    /**
+     * Global variable for product price TextView
+     */
+    private EditText mPriceEditText;
+    /**
+     * Global variable for stocked quantity TextView
+     */
+    private EditText mQuantityStockedEditText;
+    /**
+     * Global variable for increase quantity Button
+     */
+    private Button mIncreaseQuantityButton;
+    /**
+     * Global variable for decrease quantity Button
+     */
+    private Button mDecreaseQuantityButton;
+    /**
+     * Global variable for order quantity EditText
+     */
+    private EditText mOrderQuantityEditText;
+    /**
+     * Global variable for order Button
+     */
+    private Button mOrderButton;
+    /**
+     * Global variable for delete product record Button
+     */
+    private Button mDeleteProductButton;
+    /**
+     * Global variable for the Floating Action Button
+     */
+    private FloatingActionButton mFloatingActionButton;
     /**
      * Global boolean for whether user has entered/edited any product info
      */
@@ -137,7 +120,7 @@ public class EditorActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.v(LOG_TAG, "Entering onCreate method");
+
         setContentView(R.layout.activity_editor);
 
         // Store references to layout views
@@ -155,7 +138,7 @@ public class EditorActivity extends AppCompatActivity
 
         // Set text for currency symbol, to allow for localization.
         TextView currencySymbol = findViewById(R.id.editor_price_currency_symbol);
-        currencySymbol.setText("$");
+        currencySymbol.setText(R.string.currency_symbol_dollar_sign);
 
         // Get URI passed with calling Intent. (URI could be null).
         mPassedUri = getIntent().getData();
@@ -164,35 +147,31 @@ public class EditorActivity extends AppCompatActivity
         if (mPassedUri != null) {
             // Change Activity title to indicate that user is editing details of an existing product
             // rather than adding a new product.
-            setTitle("Edit Product");
+            setTitle(getString(R.string.activity_title_edit_product));
 
             // Initialize/reuse CursorLoader to retrieve current data for existing product to be edited
             getLoaderManager().initLoader(EDIT_PRODUCT_LOADER, null, this);
         } else { // if URI is null, then EditorActivity has been initiated by StockroomActivity 'add product' fab
-            setTitle("Add Product");
+            setTitle(getString(R.string.activity_title_add_product));
 
             // Make 'add product image' button visible
             mAddImageButton.setVisibility(View.VISIBLE);
 
             // Add TextEdit hints for a new product
-            mNameEditText.setHint("Enter product name");
-            mPriceEditText.setHint("Enter product price (eg: 14.95)");
-            mQuantityStockedEditText.setHint("Enter current quantity (eg: 20");
+            mNameEditText.setHint(R.string.hint_enter_name);
+            mPriceEditText.setHint(R.string.hint_enter_price);
+            mQuantityStockedEditText.setHint(R.string.hint_enter_quantity_in_stock);
 
             // Adding a new product, so hide UI elements related to existing products.
             findViewById(R.id.editor_quantity_to_order_container).setVisibility(View.GONE);
             findViewById(R.id.editor_button_delete_product_record).setVisibility(View.GONE);
 
-//            // Invalidate the options menu, so the "Delete" menu option can be hidden.
-//            // (It doesn't make sense to delete a pet that hasn't been created yet.)
-//            invalidateOptionsMenu();
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.v(LOG_TAG, "Entering onResume method");
 
         // Add ontouchlisteners to detect when user enters/revises any product data and set mProductHasChanged to 'true'.
         // Buttons will also update mProductHasChanged, via the onclicklisteners added below.
@@ -207,12 +186,12 @@ public class EditorActivity extends AppCompatActivity
         // If URI saved in onCreate() is null, then EditorActivity has been initiated by Floating Action Button
         // in the StockroomActivity. Add product image button is only displayed in 'Add Product' mode.
         if (mPassedUri == null) {
-            Log.v(LOG_TAG, "In onResume method; about to add onclicklistener");
+
             // Add onclicklistener to 'add product image' button
             mAddImageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Log.v(LOG_TAG, "Add Image button click has been detected - entering onClick method");
+
                     Intent pickImage = new Intent(Intent.ACTION_PICK,
                             android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     // Check that Intent can be resolved and start Intent
@@ -246,7 +225,7 @@ public class EditorActivity extends AppCompatActivity
                     } catch (NumberFormatException e) {
                         // Notify user that their input is invalid
                         Log.e(LOG_TAG, "Invalid quantity input; cannot parse to integer");
-                        Toast.makeText(getApplicationContext(), "Invalid quantity input - please try again", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), R.string.message_error_invalid_entry_quantity, Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -277,7 +256,7 @@ public class EditorActivity extends AppCompatActivity
                     } catch (NumberFormatException e) {
                         // Notify user that their input is invalid
                         Log.e(LOG_TAG, "Invalid quantity input; cannot parse to integer");
-                        Toast.makeText(getApplicationContext(), "Invalid quantity input - please try again", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), R.string.message_error_invalid_entry_quantity, Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -301,10 +280,10 @@ public class EditorActivity extends AppCompatActivity
 
                             // Validate data and display toast message accordingly
                             if (quantityInt < 0) {
-                                Toast.makeText(getApplicationContext(), "Cannot order a negative quantity",
+                                Toast.makeText(getApplicationContext(), R.string.message_error_negative_quantity,
                                         Toast.LENGTH_SHORT).show();
                             } else if (quantityInt == 0) {
-                                Toast.makeText(getApplicationContext(), "Please choose quantity to order",
+                                Toast.makeText(getApplicationContext(), R.string.message_notice_choose_quantity,
                                         Toast.LENGTH_SHORT).show();
                             } else {
                                 // Create a final variable that can be referenced in the inner class for the dialog listener
@@ -327,24 +306,25 @@ public class EditorActivity extends AppCompatActivity
                                                 String name = mNameEditText.getText().toString();
                                                 // Check that product name has not been cleared before adding to Intent's subject line.
                                                 if (!TextUtils.isEmpty(name)) {
-                                                    intent.putExtra(Intent.EXTRA_SUBJECT, "Purchase Order: " + name);
+                                                    intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.email_order_subject_line) + name);
                                                 }
 
                                                 // Add body text to email Intent
-                                                intent.putExtra(Intent.EXTRA_TEXT, "Hello,\n\nWe wish to purchase " +
-                                                        displayOrderQuantity + " more of your company's " + name + " product.");
+                                                intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.email_order_body_1of3) +
+                                                        displayOrderQuantity + getString(R.string.email_order_body_2of3) + name +
+                                                        getString(R.string.email_order_body_3of3));
 
                                                 //Check that Intent can be resolved and start Intent
                                                 PackageManager packageManager = getApplicationContext().getPackageManager();
                                                 if (intent.resolveActivity(packageManager) != null) {
                                                     startActivity(intent);
                                                 } else {
-                                                    Toast.makeText(getApplicationContext(), "Cannot locate an appropriate application for sending order",
+                                                    Toast.makeText(getApplicationContext(), R.string.message_error_no_app_for_email,
                                                             Toast.LENGTH_SHORT).show();
                                                 }
 
                                                 // Reset order quantity to zero
-                                                mOrderQuantityEditText.setText("0");
+                                                mOrderQuantityEditText.setText(R.string.text_zero);
                                             }
                                         };
 
@@ -355,7 +335,7 @@ public class EditorActivity extends AppCompatActivity
                         } catch (NumberFormatException e) {
                             // Notify user that their input is invalid
                             Log.e(LOG_TAG, "Invalid quantity input; cannot parse to integer");
-                            Toast.makeText(getApplicationContext(), "Invalid quantity input - please try again", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), R.string.message_error_invalid_entry_quantity, Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -379,10 +359,10 @@ public class EditorActivity extends AppCompatActivity
                                     // return to Stockroom Activity, and display toast message confirming deletion.
                                     int rowsDeleted = getContentResolver().delete(mPassedUri, null, null);
                                     if (rowsDeleted == 0) {
-                                        Toast.makeText(getApplicationContext(), "Failed to delete product record",
+                                        Toast.makeText(getApplicationContext(), R.string.message_error_failed_to_delete_product,
                                                 Toast.LENGTH_SHORT).show();
                                     } else {
-                                        Toast.makeText(getApplicationContext(), "Product record deleted",
+                                        Toast.makeText(getApplicationContext(), R.string.message_product_deleted,
                                                 Toast.LENGTH_SHORT).show();
                                         finish();
                                     }
@@ -402,17 +382,24 @@ public class EditorActivity extends AppCompatActivity
                 // Call helper method to collect user input and store in a ContentValues object
                 ContentValues values = collectInput();
 
+                // Check that we have received a non-null ContentValues object from helper method
+                if (values == null) { // collectInput helper method unable to process data and returned a null ContentValues
+                    // Return without performing database operations on the null ContentValues object
+                    return;
+                }
+
                 // If URI passed to EditorActivity with starting Intent is null, it's in 'Add Product' mode
                 if (mPassedUri == null) {
+
                     // Insert ContentValues object with product data into the database
                     Uri uri = getContentResolver().insert(ProductEntry.CONTENT_URI, values);
                     // Check returned URI to see whether database insertion was successful
                     if (uri == null) {
                         // Warn user that database insertion failed
-                        Toast.makeText(getApplicationContext(), "Failed to save new product", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), R.string.message_error_failed_to_add_product, Toast.LENGTH_SHORT).show();
                     } else {
                         // Notify user that database insertion was successful
-                        Toast.makeText(getApplicationContext(), "New product saved", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), R.string.message_product_added, Toast.LENGTH_SHORT).show();
                         // Return to StockroomActivity
                         finish();
                     }
@@ -422,10 +409,10 @@ public class EditorActivity extends AppCompatActivity
                     // Check returned integer to see whether database entry update was successful
                     if (rowsUpdated == 0) {
                         // Warn user that database update failed
-                        Toast.makeText(getApplicationContext(), "Failed to update product", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), R.string.message_error_failed_to_update_product, Toast.LENGTH_SHORT).show();
                     } else {
                         // Notify user that database update was successful
-                        Toast.makeText(getApplicationContext(), "Product entry updated", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), R.string.message_product_updated, Toast.LENGTH_SHORT).show();
                         // Return to StockroomActivity
                         finish();
                     }
@@ -436,15 +423,15 @@ public class EditorActivity extends AppCompatActivity
 
     @Nullable
     private ContentValues collectInput() {
-        Log.v(LOG_TAG, "Entering collectInput method");
+
         // Check whether user has added/edited product info before proceeding.
         // If not, notify user and return early.
         if (mProductHasChanged == false) {
             if (mPassedUri == null) {
-                Toast.makeText(this, "No product info to save", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.message_notice_no_product_data_to_save, Toast.LENGTH_SHORT).show();
                 return null;
             } else {
-                Toast.makeText(this, "Make desired edit(s) before saving", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.message_notice_no_product_edits_to_save, Toast.LENGTH_SHORT).show();
                 return null;
             }
         }
@@ -467,7 +454,7 @@ public class EditorActivity extends AppCompatActivity
         // Name is required - cannot be null or empty.
         String name = mNameEditText.getText().toString();
         if (TextUtils.isEmpty(name)) {
-            Toast.makeText(this, "Product name required", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.message_notice_name_required, Toast.LENGTH_SHORT).show();
             return null;
         } else {
             // If valid name, add to ContentValues
@@ -479,13 +466,13 @@ public class EditorActivity extends AppCompatActivity
         String priceString = mPriceEditText.getText().toString();
         int priceInt;
         if (TextUtils.isEmpty(priceString)) {
-            Toast.makeText(this, "Product price required", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.message_notice_price_required, Toast.LENGTH_SHORT).show();
             return null;
         } else {
             priceInt = ProductDbHelper.priceStringToDb(priceString);
             // Check whether helper method has properly parsed the user's input
             if (priceInt == ProductDbHelper.PRICE_PARSE_FAILURE) {
-                Toast.makeText(this, "Valid price required. (e.g. 14.95)", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.message_notice_valid_price_required, Toast.LENGTH_SHORT).show();
                 return null;
             } else {
                 values.put(ProductEntry.COLUMN_PRODUCT_PRICE, priceInt);
@@ -496,8 +483,8 @@ public class EditorActivity extends AppCompatActivity
         // Quantity must parse into a usable value and must be zero or greater.
         String quantityString = mQuantityStockedEditText.getText().toString();
         int quantityInt = 0;
-        if (TextUtils.isEmpty(name)) {
-            Toast.makeText(this, "Stocked quantity required", Toast.LENGTH_SHORT).show();
+        if (TextUtils.isEmpty(quantityString)) {
+            Toast.makeText(this, R.string.message_notice_stocked_quantity_required, Toast.LENGTH_SHORT).show();
             return null;
         } else {
             // TODO: COULD POSSIBLY EXTRACT BELOW VALIDATION INTO A SINGLE METHOD TO BE CALLED FROM HERE & IN QUANTITY BUTTON LISTENERS
@@ -506,8 +493,8 @@ public class EditorActivity extends AppCompatActivity
                 quantityInt = Integer.parseInt(quantityString);
             } catch (NumberFormatException e) {
                 // Notify user that their input is invalid
-                Log.e(LOG_TAG, "Invalid quantity input; cannot parse to integer");
-                Toast.makeText(getApplicationContext(), "Invalid quantity input - please try again", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), R.string.message_notice_valid_quantity_required, Toast.LENGTH_SHORT).show();
+                return null;
             }
 
             // If valid quantity, add to ContentValues
@@ -529,7 +516,7 @@ public class EditorActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        Log.v(LOG_TAG, "Entering onLoadFinished method");
+
         // If cursor is empty, return early
         if (!(cursor.getCount() > 0)) {
             Log.e(LOG_TAG, "Failed to return cursor with data.");
@@ -541,7 +528,6 @@ public class EditorActivity extends AppCompatActivity
 
         // Retrieve values from the selected product's database entry
         byte[] cursorImage = cursor.getBlob(cursor.getColumnIndexOrThrow(ProductEntry.COLUMN_PRODUCT_IMAGE));
-        Log.v(LOG_TAG, "In onLoadFinished method; blob for product image has a null value");
         String cursorName = cursor.getString(cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_NAME));
         Integer cursorPriceInteger = cursor.getInt(cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_PRICE));
         String cursorPriceString = null;
@@ -627,7 +613,7 @@ public class EditorActivity extends AppCompatActivity
      */
     @Override
     public void onBackPressed() {
-        Log.v(LOG_TAG,"Entering onBackPressed method; mProductHasChanged is " + mProductHasChanged);
+
         // If no changes have been made to the product, handle back button as normal
         if (!mProductHasChanged) {
             super.onBackPressed();
@@ -666,7 +652,7 @@ public class EditorActivity extends AppCompatActivity
                         mImageBitmap = ProductDbHelper.sizeImageForDb(rawBitmap);
                     } catch (IOException e) {
                         // Notify user that image selection has failed
-                        Toast.makeText(getApplicationContext(), "Failed to add image", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), R.string.message_error_failed_to_add_image, Toast.LENGTH_SHORT).show();
                         Log.e(LOG_TAG, "Error processing camera photo into local bitmap", e);
                     }
 
@@ -683,7 +669,7 @@ public class EditorActivity extends AppCompatActivity
                 break;
 
             default:
-                Toast.makeText(getApplicationContext(),"Unable to perform image selection",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), R.string.message_error_failed_to_pick_image, Toast.LENGTH_SHORT).show();
                 break;
 
         }
@@ -699,9 +685,9 @@ public class EditorActivity extends AppCompatActivity
         // Create an AlertDialog.Builder and set the message, and click listeners
         // for the positive and negative buttons on the dialog.
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Are you sure you want to place this order?");
-        builder.setPositiveButton("Place order", confirmButtonClickListener);
-        builder.setNegativeButton("Not right now", new DialogInterface.OnClickListener() {
+        builder.setMessage(R.string.dialog_prompt_confirm_order);
+        builder.setPositiveButton(R.string.dialog_option_place_order, confirmButtonClickListener);
+        builder.setNegativeButton(R.string.dialog_option_not_right_now, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked the "No" button, so dismiss the dialog
                 // and continue editing the product.
@@ -726,9 +712,9 @@ public class EditorActivity extends AppCompatActivity
         // Create an AlertDialog.Builder and set the message, and click listeners
         // for the positive and negative buttons on the dialog.
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Are you sure you want to delete this product record?");
-        builder.setPositiveButton("Delete record", deletionButtonClickListener);
-        builder.setNegativeButton("Retain record", new DialogInterface.OnClickListener() {
+        builder.setMessage(R.string.dialog_prompt_delete_product_record);
+        builder.setPositiveButton(R.string.dialog_option_delete_record, deletionButtonClickListener);
+        builder.setNegativeButton(R.string.dialog_option_retain_record, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked the "No" button, so dismiss the dialog
                 // and continue editing the product.
@@ -753,9 +739,9 @@ public class EditorActivity extends AppCompatActivity
         // Create an AlertDialog.Builder and set the message, and click listeners
         // for the positive and negative buttons on the dialog.
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Discard your changes and quit editing?");
-        builder.setPositiveButton("Discard", discardButtonClickListener);
-        builder.setNegativeButton("Keep editing", new DialogInterface.OnClickListener() {
+        builder.setMessage(R.string.dialog_prompt_discard_unsaved_changes);
+        builder.setPositiveButton(R.string.dialog_option_discard_changes, discardButtonClickListener);
+        builder.setNegativeButton(R.string.dialog_option_keep_editing, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked the "Keep editing" button, so dismiss the dialog
                 // and continue editing the product.
@@ -773,7 +759,6 @@ public class EditorActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
-        Log.v(LOG_TAG, "Entering onStop method");
 
         // Release resources
         mAddImageButton.setOnClickListener(null);

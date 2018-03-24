@@ -71,7 +71,7 @@ public class ProductProvider extends ContentProvider{
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, 
                         @Nullable String[] selectionArgs, @Nullable String sortOrder) {
-        Log.v(LOG_TAG,"Entering query() method; passed URI is: " + uri.toString());
+
         // Get readable database
         SQLiteDatabase database = mDbHelper.getReadableDatabase();
 

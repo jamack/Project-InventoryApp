@@ -15,7 +15,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -69,7 +68,7 @@ implements LoaderManager.LoaderCallbacks<Cursor> {
         mProductsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Log.v(LOG_TAG,"In onCreate method; defining onItemClick method for new OnItemClickListener");
+
                 //Create an intent
                 Intent intent = new Intent(StockroomActivity.this,EditorActivity.class);
 
@@ -121,7 +120,6 @@ implements LoaderManager.LoaderCallbacks<Cursor> {
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         mCursorAdapter.swapCursor(cursor);
-        Log.v(LOG_TAG,"In onLoadFinished method; cursor returned " + cursor.getCount() + " rows");
     }
 
     @Override
@@ -152,7 +150,7 @@ implements LoaderManager.LoaderCallbacks<Cursor> {
                     // Display alert dialog for user to proceed with deletion or cancel the deletion
                     showDeleteConfirmationDialog();
                 } else {
-                    Toast.makeText(this,"No products to delete",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.message_notice_no_products_to_delete,Toast.LENGTH_SHORT).show();
                 }
                 return true;
         }
@@ -163,14 +161,14 @@ implements LoaderManager.LoaderCallbacks<Cursor> {
         // Create an AlertDialog.Builder and set the message and click listeners
         // for the positive and negative buttons on the dialog.
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Are you sure you wish to delete all product entries?");
-        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+        builder.setMessage(R.string.dialog_prompt_delete_all_products);
+        builder.setPositiveButton(R.string.dialog_option_delete, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked the "Delete" button, so delete all product entries.
                 getContentResolver().delete(ProductEntry.CONTENT_URI,null,null);
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.dialog_option_cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked the "Cancel" button, so dismiss the dialog
                 if (dialog != null) {
@@ -201,7 +199,7 @@ implements LoaderManager.LoaderCallbacks<Cursor> {
         byte[] bitmapByteArray = null;
 
         // Add values for first product to ContentValues object
-        contentValues.put(ProductEntry.COLUMN_PRODUCT_NAME, "Acme WhamHammer Stapler");
+        contentValues.put(ProductEntry.COLUMN_PRODUCT_NAME, getString(R.string.sample_product_01_name));
         contentValues.put(ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED, 3);
         contentValues.put(ProductEntry.COLUMN_PRODUCT_PRICE,1495);
         bitmap = ProductDbHelper.sizeImageForDb(
@@ -214,7 +212,7 @@ implements LoaderManager.LoaderCallbacks<Cursor> {
 
         // Clear ContentValues object and add values for an additional product
         contentValues.clear();
-        contentValues.put(ProductEntry.COLUMN_PRODUCT_NAME, "Bob's Best Wackadoodle");
+        contentValues.put(ProductEntry.COLUMN_PRODUCT_NAME, getString(R.string.sample_product_02_name));
         contentValues.put(ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED, 20);
         contentValues.put(ProductEntry.COLUMN_PRODUCT_PRICE,99);
 
@@ -223,7 +221,7 @@ implements LoaderManager.LoaderCallbacks<Cursor> {
 
         // Clear ContentValues object and add values for an additional product
         contentValues.clear();
-        contentValues.put(ProductEntry.COLUMN_PRODUCT_NAME, "Smiles-n-Stuff YummyCone");
+        contentValues.put(ProductEntry.COLUMN_PRODUCT_NAME, getString(R.string.sample_product_03_name));
         contentValues.put(ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED, 1000);
         contentValues.put(ProductEntry.COLUMN_PRODUCT_PRICE,300);
         bitmap = ProductDbHelper.sizeImageForDb(
