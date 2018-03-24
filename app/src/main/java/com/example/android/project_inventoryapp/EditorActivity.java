@@ -15,9 +15,11 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -31,6 +33,7 @@ import com.example.android.project_inventoryapp.data.ProductDbHelper;
 
 import java.io.IOException;
 
+// TODO: ADD BACK BUTTON, CHECK FOR UNSAVED CHANGES, & HANDLE VIA ALERTDIALOG
 public class EditorActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -588,6 +591,104 @@ public class EditorActivity extends AppCompatActivity
         mOrderQuantityEditText.setText("");
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // User clicked on a menu option in the app bar overflow menu
+        switch (item.getItemId()) {
+            // Respond to a click on the "Up" arrow button in the app bar
+            case android.R.id.home:
+                // If the product hasn't changed, continue with navigating up to parent activity (StockroomActivity).
+                if (!mProductHasChanged) {
+                    NavUtils.navigateUpFromSameTask(EditorActivity.this);
+                    return true;
+                }
+
+                // Otherwise if there are unsaved changes, setup a dialog to warn the user.
+                // Create a click listener to handle the user confirming that
+                // changes should be discarded.
+                DialogInterface.OnClickListener discardButtonClickListener =
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                // User clicked "Discard" button, navigate to parent activity.
+                                NavUtils.navigateUpFromSameTask(EditorActivity.this);
+                            }
+                        };
+
+                // Show a dialog that notifies the user they have unsaved changes
+                showUnsavedChangesDialog(discardButtonClickListener);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * This method is called when the back button is pressed.
+     */
+    @Override
+    public void onBackPressed() {
+        Log.v(LOG_TAG,"Entering onBackPressed method; mProductHasChanged is " + mProductHasChanged);
+        // If no changes have been made to the product, handle back button as normal
+        if (!mProductHasChanged) {
+            super.onBackPressed();
+            return;
+        }
+
+        // Otherwise if there are unsaved changes, setup a dialog to warn the user.
+        // Create a click listener to handle the user confirming that changes should be discarded.
+        DialogInterface.OnClickListener discardButtonClickListener =
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // User clicked "Discard" button, close the current activity.
+                        finish();
+                    }
+                };
+
+        // Show dialog that there are unsaved changes
+        showUnsavedChangesDialog(discardButtonClickListener);
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent returnedIntent) {
+        super.onActivityResult(requestCode, resultCode, returnedIntent);
+        switch (requestCode) {
+            case INTENT_CHOOSE_IMAGE:
+                if (resultCode == RESULT_OK) {
+                    // Retrieve URI for selected image
+                    Uri selectedImage = returnedIntent.getData();
+
+                    // Ensure the product image view is visible
+                    mImageView.setVisibility(View.VISIBLE);
+
+                    // Get image in bitmap format from the URI
+                    try {
+                        Bitmap rawBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+                        mImageBitmap = ProductDbHelper.sizeImageForDb(rawBitmap);
+                    } catch (IOException e) {
+                        // Notify user that image selection has failed
+                        Toast.makeText(getApplicationContext(), "Failed to add image", Toast.LENGTH_SHORT).show();
+                        Log.e(LOG_TAG, "Error processing camera photo into local bitmap", e);
+                    }
+
+                    // Set selected image on the image view
+                    mImageView.setImageBitmap(mImageBitmap);
+
+                    // Since image has been selected, turn the 'add image' button off
+                    mAddImageButton.setVisibility(View.GONE);
+
+                    // Update mProductHasChanged boolean
+                    mProductHasChanged = true;
+                }
+
+                break;
+
+            default:
+                Toast.makeText(getApplicationContext(),"Unable to perform image selection",Toast.LENGTH_SHORT).show();
+                break;
+
+        }
+    }
+
     /**
      * Show a dialog that asks the user to confirm whether they want to order more of the product.
      *
@@ -642,44 +743,31 @@ public class EditorActivity extends AppCompatActivity
         alertDialog.show();
     }
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent returnedIntent) {
-        super.onActivityResult(requestCode, resultCode, returnedIntent);
-        switch (requestCode) {
-            case INTENT_CHOOSE_IMAGE:
-                if (resultCode == RESULT_OK) {
-                    // Retrieve URI for selected image
-                    Uri selectedImage = returnedIntent.getData();
-
-                    // Ensure the product image view is visible
-                    mImageView.setVisibility(View.VISIBLE);
-
-                    // Get image in bitmap format from the URI
-                    try {
-                        Bitmap rawBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
-                        mImageBitmap = ProductDbHelper.sizeImageForDb(rawBitmap);
-                    } catch (IOException e) {
-                        // Notify user that image selection has failed
-                        Toast.makeText(getApplicationContext(), "Failed to add image", Toast.LENGTH_SHORT).show();
-                        Log.e(LOG_TAG, "Error processing camera photo into local bitmap", e);
-                    }
-
-                    // Set selected image on the image view
-                    mImageView.setImageBitmap(mImageBitmap);
-
-                    // Since image has been selected, turn the 'add image' button off
-                    mAddImageButton.setVisibility(View.GONE);
-
-                    // Update mProductHasChanged boolean
-                    mProductHasChanged = true;
+    /**
+     * Show a dialog that warns the user there are unsaved changes that will be lost
+     * if they continue leaving the editor.
+     *
+     * @param discardButtonClickListener click listener to notify user and handle response
+     */
+    private void showUnsavedChangesDialog(DialogInterface.OnClickListener discardButtonClickListener) {
+        // Create an AlertDialog.Builder and set the message, and click listeners
+        // for the positive and negative buttons on the dialog.
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Discard your changes and quit editing?");
+        builder.setPositiveButton("Discard", discardButtonClickListener);
+        builder.setNegativeButton("Keep editing", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "Keep editing" button, so dismiss the dialog
+                // and continue editing the product.
+                if (dialog != null) {
+                    dialog.dismiss();
                 }
+            }
+        });
 
-                break;
-
-            default:
-                Toast.makeText(getApplicationContext(),"Unable to perform image selection",Toast.LENGTH_SHORT).show();
-                break;
-
-        }
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     @Override

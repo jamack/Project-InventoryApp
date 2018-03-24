@@ -1,10 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Options menu for the StockroomActivity -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.android.project_inventoryapp.StockroomActivity">
+    tools:context=".StockroomActivity">
+
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:id="@+id/action_insert_sample_data"
+        android:title="@string/stockroom_overflow_insert_sample_data"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_delete_all_products"
+        android:title="@string/stockroom_overflow_delete_all_products"
         app:showAsAction="never" />
 </menu>

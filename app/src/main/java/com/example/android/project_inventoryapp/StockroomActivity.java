@@ -1,20 +1,29 @@
 package com.example.android.project_inventoryapp;
 
+import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.example.android.project_inventoryapp.data.ProductContract;
 import com.example.android.project_inventoryapp.data.ProductContract.ProductEntry;
 import com.example.android.project_inventoryapp.data.ProductDbHelper;
 
@@ -40,50 +49,6 @@ implements LoaderManager.LoaderCallbacks<Cursor> {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stockroom);
-
-
-
-//        // ** TESTING DATABASE HELPER METHOD **
-//        ProductDbHelper dbHelper = new ProductDbHelper(this);
-//        SQLiteDatabase database = dbHelper.getReadableDatabase();
-//
-//        // ** TESTING CONTENTPROVIDER INSERT METHOD **
-//        Uri insertUri = Uri.parse(ProductContract.BASE_CONTENT_URI + "/" + ProductContract.ProductEntry.TABLE_NAME);
-//        Log.v(LOG_TAG,"In onCreate method; generated URI is: " + insertUri.toString());
-//        Log.v(LOG_TAG,"In onCreate method; UriMatcher URI for entire products table is: " +
-//                ProductContract.CONTENT_AUTHORITY + ProductContract.ProductEntry.TABLE_NAME);
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_NAME, "Acme WhamHammer Stapler");
-//        contentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED, 100);
-//        contentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE,1995);
-//
-////        BitmapDrawable bitmapDrawable = (BitmapDrawable) getDrawable(R.drawable.red_stapler);
-////        Bitmap bitmap = bitmapDrawable.getBitmap();
-////        byte[] image = ProductDbHelper.getBytes(bitmap);
-//
-//        Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(),
-//                R.drawable.red_stapler);
-//        byte[] image = ProductDbHelper.getBytes(bitmap);
-//
-//        contentValues.put(ProductEntry.COLUMN_PRODUCT_IMAGE,image);
-//
-//        getContentResolver().insert(insertUri,contentValues);
-//
-//        // insert additional products(s)
-//        contentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_NAME, "Bob's Best Wackadoodle");
-//        contentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED, 20);
-//        contentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE,99);
-//
-//        getContentResolver().insert(insertUri,contentValues);
-
-//        contentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_NAME, "A1 Sice-n-Dice Papercutter");
-//        contentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED, 1);
-//        contentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE,1495);
-//
-//        getContentResolver().insert(insertUri,contentValues);
-
-
-
 
         // Get reference to ListView
         mProductsListView = findViewById(R.id.stockroom_listview);
@@ -164,63 +129,109 @@ implements LoaderManager.LoaderCallbacks<Cursor> {
         // Nullify the old cursor to prevent memory leaks
         mCursorAdapter.swapCursor(null);
     }
-}
 
-// ** TESTING DATABASE HELPER METHOD **
-//        ProductDbHelper dbHelper = new ProductDbHelper(this);
-//        SQLiteDatabase database = dbHelper.getReadableDatabase();
-//
-//        // ** TESTING CONTENTPROVIDER INSERT METHOD **
-//        Uri insertUri = Uri.parse(ProductContract.BASE_CONTENT_URI + "/" + ProductContract.ProductEntry.TABLE_NAME);
-//        Log.v(LOG_TAG,"In onCreate method; generated URI is: " + insertUri.toString());
-//        Log.v(LOG_TAG,"In onCreate method; UriMatcher URI for entire products table is: " +
-//                ProductContract.CONTENT_AUTHORITY + ProductContract.ProductEntry.TABLE_NAME);
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_NAME, "Acme WhamHammer Stapler");
-//        contentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED, 1);
-//        contentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE,1991);
-//
-//        getContentResolver().insert(insertUri,contentValues);
-//
-//        // insert additional pet(s)
-//        getContentResolver().insert(insertUri,contentValues);
-//        getContentResolver().insert(insertUri,contentValues);
-//
-//        // ** TESTING CONTENTPROVIDER UPDATE METHOD **
-//        Log.v(LOG_TAG,"Testing the update() method");
-//        Uri updateUri = Uri.parse(ProductContract.BASE_CONTENT_URI + "/" + ProductContract.ProductEntry.TABLE_NAME + "/2");
-//        ContentValues updateContentValues = new ContentValues();
-//        updateContentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_NAME, "Acme WhamHammer Stapler");
-//        updateContentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED, 100);
-//        updateContentValues.put(ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE,1499);
-//
-//        getContentResolver().update(updateUri,updateContentValues,null,null);
-//
-//        // ** TESTING CONTENTPROVIDER DELETE METHOD - FOR SINGLE PRODUCT **
-//        Log.v(LOG_TAG,"Testing the delete() method for a single product");
-//        Uri deleteUriSingle = Uri.parse(ProductContract.BASE_CONTENT_URI + "/" + ProductContract.ProductEntry.TABLE_NAME + "/1");
-//        getContentResolver().delete(deleteUriSingle,null,null);
-//
-//        // ** TESTING CONTENTPROVIDER DELETE METHOD - FOR ALL PRODUCTS **
-//        Log.v(LOG_TAG,"Testing the delete() method for all products in the database");
-//        Uri deleteUriAll = Uri.parse(ProductContract.BASE_CONTENT_URI + "/" + ProductContract.ProductEntry.TABLE_NAME);
-//        getContentResolver().delete(deleteUriAll,null,null);
-//
-//                // ** TESTING CONTENTPROVIDER QUERY METHOD - FOR SINGLE PRODUCT**
-//        Uri queryUriSingle = Uri.parse(ProductContract.BASE_CONTENT_URI + "/" + ProductContract.ProductEntry.TABLE_NAME + "/8");
-//        Uri queryUriSingle = Uri.parse(ProductContract.BASE_CONTENT_URI + "/" + ProductContract.ProductEntry.TABLE_NAME);
-//        queryUriSingle = ContentUris.withAppendedId(queryUriSingle,1L);
-//
-//        Cursor cursorSingle = getContentResolver().query(queryUriSingle,
-//                null,null,null,null);
-//        int rowCountSingle = cursorSingle.getCount();
-//        Log.v(LOG_TAG,"Testing the query() method for a single product; " + rowCountSingle + " rows returned");
-//
-//        // ** TESTING CONTENTPROVIDER QUERY METHOD - FOR ALL PRODUCTS**
-//        Log.v(LOG_TAG,"Testing the query() method for all products in the database");
-//        Uri queryUriAll = Uri.parse(ProductContract.BASE_CONTENT_URI + "/" + ProductContract.ProductEntry.TABLE_NAME);
-//
-//        Cursor cursorAll = getContentResolver().query(queryUriAll,
-//                null,null,null,null);
-//        int rowCountAll = cursorAll.getCount();
-//        Log.v(LOG_TAG,"Testing the query() method for all products in database; " + rowCountAll + " rows returned");
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu options from the designated resources/menus xml file
+        getMenuInflater().inflate(R.menu.menu_stockroom, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Match user's menu item choice with one of the below cases
+        switch (item.getItemId()) {
+            // User has selected the "insert sample data" menu option
+            case R.id.action_insert_sample_data:
+                insertSampleData();
+                return true;
+            // Respond to a click on the "Delete all entries" menu option
+            case R.id.action_delete_all_products:
+                // Check whether any there are currently any products in the database
+                if (mCursorAdapter.getCount() != 0) {
+                    // Display alert dialog for user to proceed with deletion or cancel the deletion
+                    showDeleteConfirmationDialog();
+                } else {
+                    Toast.makeText(this,"No products to delete",Toast.LENGTH_SHORT).show();
+                }
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void showDeleteConfirmationDialog() {
+        // Create an AlertDialog.Builder and set the message and click listeners
+        // for the positive and negative buttons on the dialog.
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are you sure you wish to delete all product entries?");
+        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "Delete" button, so delete all product entries.
+                getContentResolver().delete(ProductEntry.CONTENT_URI,null,null);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "Cancel" button, so dismiss the dialog
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    /**
+     * Test method to insert sample data to database.
+     * Includes entries both with and without associated images.
+     */
+    private void insertSampleData() {
+
+        // Format URI for the database table path
+        Uri insertUri = Uri.parse(ProductContract.BASE_CONTENT_URI + "/" + ProductEntry.TABLE_NAME);
+
+        // Create new ContentValues object
+        ContentValues contentValues = new ContentValues();
+
+        // Create bitmap variables for formatting images for database
+        Bitmap bitmap = null;
+        byte[] bitmapByteArray = null;
+
+        // Add values for first product to ContentValues object
+        contentValues.put(ProductEntry.COLUMN_PRODUCT_NAME, "Acme WhamHammer Stapler");
+        contentValues.put(ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED, 3);
+        contentValues.put(ProductEntry.COLUMN_PRODUCT_PRICE,1495);
+        bitmap = ProductDbHelper.sizeImageForDb(
+                BitmapFactory.decodeResource(this.getResources(), R.drawable.red_stapler));
+        bitmapByteArray = ProductDbHelper.getBytes(bitmap);
+        contentValues.put(ProductEntry.COLUMN_PRODUCT_IMAGE,bitmapByteArray);
+
+        // Insert product into database
+        getContentResolver().insert(insertUri,contentValues);
+
+        // Clear ContentValues object and add values for an additional product
+        contentValues.clear();
+        contentValues.put(ProductEntry.COLUMN_PRODUCT_NAME, "Bob's Best Wackadoodle");
+        contentValues.put(ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED, 20);
+        contentValues.put(ProductEntry.COLUMN_PRODUCT_PRICE,99);
+
+        // Insert product into database
+        getContentResolver().insert(insertUri,contentValues);
+
+        // Clear ContentValues object and add values for an additional product
+        contentValues.clear();
+        contentValues.put(ProductEntry.COLUMN_PRODUCT_NAME, "Smiles-n-Stuff YummyCone");
+        contentValues.put(ProductEntry.COLUMN_PRODUCT_QUANTITY_STOCKED, 1000);
+        contentValues.put(ProductEntry.COLUMN_PRODUCT_PRICE,300);
+        bitmap = ProductDbHelper.sizeImageForDb(
+                BitmapFactory.decodeResource(this.getResources(), R.drawable.yummycone));
+        bitmapByteArray = ProductDbHelper.getBytes(bitmap);
+        contentValues.put(ProductEntry.COLUMN_PRODUCT_IMAGE,bitmapByteArray);
+
+        // Insert product into database
+        getContentResolver().insert(insertUri,contentValues);
+    }
+}

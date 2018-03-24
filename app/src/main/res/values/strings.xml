@@ -6,5 +6,7 @@
     <string name="message_product_added">Product added</string>
     <!-- Error message for failure to add product [CHAR LIMIT=20] -->
     <string name="message_error_failed_to_add_product">Failed to add product to database</string>
+    <string name="stockroom_overflow_insert_sample_data">Insert sample data</string>
+    <string name="stockroom_overflow_delete_all_products">Delete all products</string>
 
 </resources>
