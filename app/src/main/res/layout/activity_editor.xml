@@ -35,12 +35,15 @@
         android:layout_alignWithParentIfMissing="true"
         android:layout_below="@id/editor_image"
         android:layout_centerHorizontal="true"
-        tools:text="WhamHammer stapler" />
+        android:textAppearance="?android:textAppearanceLarge"
+        android:textStyle="bold"
+        tools:text="Acme WhamHammer Stapler" />
 
     <LinearLayout
         android:id="@+id/editor_price_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:layout_below="@+id/editor_name"
         android:layout_centerHorizontal="true"
         android:orientation="horizontal">
@@ -49,7 +52,9 @@
             android:id="@+id/editor_price_currency_symbol"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="$" />
+            tools:text="$"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:textStyle="bold"/>
 
         <EditText
             android:id="@+id/editor_price"
@@ -57,6 +62,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/editor_name"
             android:layout_centerHorizontal="true"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:textStyle="bold"
             tools:text="14.95" />
 
     </LinearLayout>
@@ -67,13 +74,17 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/editor_price_container"
         android:layout_centerHorizontal="true"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginBottom="32dp">
 
         <EditText
             android:id="@+id/editor_quantity_stocked"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:layout_marginRight="16dp"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:textStyle="bold"
             tools:text="3" />
 
         <LinearLayout
@@ -109,6 +120,7 @@
             android:id="@+id/editor_quantity_to_order"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginRight="16dp"
             android:text="0" />
 
         <Button
@@ -123,7 +135,10 @@
         android:id="@+id/editor_button_delete_product_record"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/editor_quantity_to_order_container"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="16dp"
+        android:layout_marginLeft="16dp"
         android:layout_centerHorizontal="true"
         android:text="Delete product record" />
 
