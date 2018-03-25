@@ -40,66 +40,82 @@ public class EditorActivity extends AppCompatActivity
      * Tag for log messages
      */
     private static final String LOG_TAG = EditorActivity.class.getSimpleName();
+
     /**
      * Constant for add image button - choose existing image intent response code
      */
     private static final int INTENT_CHOOSE_IMAGE = 0;
+
     /**
      * Constant for Edit Product CursorLoader
      */
     private static final int EDIT_PRODUCT_LOADER = 0;
+
     /**
      * URI for specific pet entry, IF editing existing pet
      */
     private Uri mPassedUri;
+
     /**
      * Global variable for button to add product image.
      */
     private Button mAddImageButton;
+
     /**
      * Global variable for product image bitmap. Initially null.
      */
     private Bitmap mImageBitmap = null;
+
     /**
      * Global variable for product image ImageView
      */
     private ImageView mImageView;
+
     /**
      * Global variable for product name EditText
      */
     private EditText mNameEditText;
+
     /**
      * Global variable for product price TextView
      */
     private EditText mPriceEditText;
+
     /**
      * Global variable for stocked quantity TextView
      */
     private EditText mQuantityStockedEditText;
+
     /**
      * Global variable for increase quantity Button
      */
     private Button mIncreaseQuantityButton;
+
     /**
      * Global variable for decrease quantity Button
      */
     private Button mDecreaseQuantityButton;
+
     /**
      * Global variable for order quantity EditText
      */
     private EditText mOrderQuantityEditText;
+
     /**
      * Global variable for order Button
      */
     private Button mOrderButton;
+
     /**
      * Global variable for delete product record Button
      */
     private Button mDeleteProductButton;
+
     /**
      * Global variable for the Floating Action Button
      */
     private FloatingActionButton mFloatingActionButton;
+
     /**
      * Global boolean for whether user has entered/edited any product info
      */
@@ -117,6 +133,13 @@ public class EditorActivity extends AppCompatActivity
         }
     };
 
+    /**
+     * Initial setup - inflate layout, store references to views,
+     * tailor visible items to 'Add Product' or 'Edit Product' mode,
+     * and - if editing existing product - initiate loader for database cursor.
+     *
+     * @param savedInstanceState prior saved state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -138,7 +161,7 @@ public class EditorActivity extends AppCompatActivity
 
         // Set text for currency symbol, to allow for localization.
         TextView currencySymbol = findViewById(R.id.editor_price_currency_symbol);
-        currencySymbol.setText(R.string.currency_symbol_dollar_sign);
+        currencySymbol.setText(R.string.symbol_dollar_sign);
 
         // Get URI passed with calling Intent. (URI could be null).
         mPassedUri = getIntent().getData();
@@ -169,10 +192,15 @@ public class EditorActivity extends AppCompatActivity
             findViewById(R.id.editor_order_colon).setVisibility(View.GONE);
             mOrderButton.setVisibility(View.GONE);
             findViewById(R.id.editor_button_delete_product_record).setVisibility(View.GONE);
-
         }
     }
 
+    /**
+     * Add {@link android.view.View.OnTouchListener} & {@link android.view.View.OnClickListener} listeners
+     * as required for either 'Add Product' or 'Edit Product' mode.
+     * <p>
+     * Assigned either first time Activity is started or upon returning to the activity after they've been released.
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -425,6 +453,12 @@ public class EditorActivity extends AppCompatActivity
         });
     }
 
+    /**
+     * Helper method to validate and collect the user's input
+     *
+     * @return {@link ContentValues} object with input paired to database's column id's.
+     * Returns null if any data has failed validation.
+     */
     @Nullable
     private ContentValues collectInput() {
 
@@ -491,7 +525,6 @@ public class EditorActivity extends AppCompatActivity
             Toast.makeText(this, R.string.message_notice_stocked_quantity_required, Toast.LENGTH_SHORT).show();
             return null;
         } else {
-            // TODO: COULD POSSIBLY EXTRACT BELOW VALIDATION INTO A SINGLE METHOD TO BE CALLED FROM HERE & IN QUANTITY BUTTON LISTENERS
             // Confirm whether user input can be parsed into an integer
             try {
                 quantityInt = Integer.parseInt(quantityString);
@@ -508,8 +541,17 @@ public class EditorActivity extends AppCompatActivity
         return values;
     }
 
+    /**
+     * Creates a loader to perform database operations on a background thread.
+     *
+     * @param i      The ID whose loader is to be created.
+     * @param bundle Any arguments supplied by the caller
+     * @return Return a new Loader instance that is ready to start loading
+     */
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+
+        // Return loader with URI of desired table (and all columns, by default)
         return new CursorLoader(this,
                 mPassedUri,
                 null,
@@ -518,6 +560,13 @@ public class EditorActivity extends AppCompatActivity
                 null);
     }
 
+    /**
+     * Called when loader has finished its load; these
+     * operations are performed on the UI thread.
+     *
+     * @param loader that has finished
+     * @param cursor the data generated by the loader
+     */
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 
@@ -572,8 +621,15 @@ public class EditorActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Called when the previously created loader is reset and its data is no longer available.
+     * Remove any reference to the previous loader's data.
+     *
+     * @param loader that is being reset
+     */
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+
         // Set all text back to being empty
         mNameEditText.setText("");
         mPriceEditText.setText("");
@@ -581,8 +637,15 @@ public class EditorActivity extends AppCompatActivity
         mOrderQuantityEditText.setText("");
     }
 
+    /**
+     * This hook is called whenever an item in the options menu is selected
+     *
+     * @param item that was selected
+     * @return boolean - 'false' to allow normal menu processing to proceed, 'true' to consume it here
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         // User clicked on a menu option in the app bar overflow menu
         switch (item.getItemId()) {
             // Respond to a click on the "Up" arrow button in the app bar
@@ -639,6 +702,13 @@ public class EditorActivity extends AppCompatActivity
         showUnsavedChangesDialog(discardButtonClickListener);
     }
 
+    /**
+     * Called when an activity launched from this activity exits
+     *
+     * @param requestCode    integer originally supplied to startActivityForResult(), allowing identification of activity result came from
+     * @param resultCode     integer returned by the child activity through its setResult() method
+     * @param returnedIntent any result data from child activity
+     */
     protected void onActivityResult(int requestCode, int resultCode, Intent returnedIntent) {
         super.onActivityResult(requestCode, resultCode, returnedIntent);
         switch (requestCode) {
@@ -760,6 +830,9 @@ public class EditorActivity extends AppCompatActivity
         alertDialog.show();
     }
 
+    /**
+     * Release system resources when activity is not visible to the user
+     */
     @Override
     protected void onStop() {
         super.onStop();
@@ -776,5 +849,4 @@ public class EditorActivity extends AppCompatActivity
         mQuantityStockedEditText.setOnTouchListener(null);
         mOrderQuantityEditText.setOnTouchListener(null);
     }
-
 }

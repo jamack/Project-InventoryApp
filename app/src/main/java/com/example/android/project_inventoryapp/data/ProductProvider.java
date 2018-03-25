@@ -67,6 +67,10 @@ public class ProductProvider extends ContentProvider{
         return true;
     }
 
+    /**
+     * Query the database and retrieve cursor with data,
+     * either for all entries or for a specific product entry.
+     */
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, 
@@ -105,7 +109,6 @@ public class ProductProvider extends ContentProvider{
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
 
         return cursor;
-        // TODO: MAKE SURE I'VE NULLIFIED THE CURSOR AT ITS ENDPOINT(S), TO RELEASE RESOURCES
     }
 
     /**
@@ -149,7 +152,6 @@ public class ProductProvider extends ContentProvider{
         // If the ID is -1, then the insertion failed. Log an error and return null.
         if (id == -1) {
             Log.e(LOG_TAG, "Failed to insert row for " + uri);
-            // TODO: SHOULD TOAST BE CALLED HERE OR AT THE POINT OF ORIGIN?
             Toast.makeText(getContext(), R.string.message_error_failed_to_add_product, Toast.LENGTH_SHORT).show();
             return null;
         }
@@ -193,7 +195,6 @@ public class ProductProvider extends ContentProvider{
 
         // Validate ContentValues data via helper method.
         // If invalid data, return early.
-        // TODO: CURRENTLY, validateData THROWS AN EXCEPTION INSTEAD OF RETURNING 'FALSE'...
         if (validateData(values) == false) {
             return 0;
         }
@@ -227,7 +228,6 @@ public class ProductProvider extends ContentProvider{
         // Check that the name is not null
         String name = values.getAsString(ProductEntry.COLUMN_PRODUCT_NAME);
         if (name == null) {
-            // TODO: MAKE THESE TOAST MESSAGES INSTEAD, RETURN 'FALSE', AND ADDRESS IT AS NEEDED IN CALLING METHOD?
             throw new IllegalArgumentException("Product requires a name");
         }
 

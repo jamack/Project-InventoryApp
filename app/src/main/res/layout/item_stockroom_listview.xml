@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_marginBottom="8dp"
+    android:layout_marginBottom="@dimen/dim_half"
     app:cardUseCompatPadding="true">
 
     <LinearLayout
@@ -14,10 +14,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_margin="8dp">
+        android:layout_margin="@dimen/dim_half">
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="@dimen/dim_zero"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical">
@@ -41,7 +41,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:textAppearanceLarge"
-                    android:layout_marginLeft="8dp"
+                    android:layout_marginLeft="@dimen/dim_half"
                     tools:text="100"
                     android:layout_weight="1"/>
 
@@ -57,10 +57,10 @@
                     android:id="@+id/listview_item_sale_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="8dp"
+                    android:layout_marginRight="@dimen/dim_half"
                     android:focusable="false"
                     android:focusableInTouchMode="false"
-                    android:text="Sale"
+                    android:text="@string/button_sale"
                     android:layout_weight="0"/>
 
             </LinearLayout>

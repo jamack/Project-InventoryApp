@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="@dimen/activity_margin"
+    android:layout_margin="@dimen/dim_baseline_value"
     android:orientation="vertical">
 
     <Button
@@ -13,13 +13,13 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:text="Add image (optional)"
+        android:text="@string/button_add_product_image"
         android:visibility="gone" />
 
     <ImageView
         android:id="@+id/editor_image"
         android:layout_width="wrap_content"
-        android:layout_height="100dp"
+        android:layout_height="@dimen/image_height"
         android:layout_alignWithParentIfMissing="true"
         android:layout_below="@+id/editor_button_add_image"
         android:layout_centerHorizontal="true"
@@ -43,7 +43,7 @@
         android:id="@+id/editor_price_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="@dimen/dim_baseline_value"
         android:layout_below="@+id/editor_name"
         android:layout_centerHorizontal="true"
         android:orientation="horizontal">
@@ -52,7 +52,7 @@
             android:id="@+id/editor_price_currency_symbol"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="$"
+            tools:text="@string/symbol_dollar_sign"
             android:textAppearance="?android:textAppearanceLarge"
             android:textStyle="bold"/>
 
@@ -75,21 +75,21 @@
         android:layout_below="@id/editor_price_container"
         android:layout_centerHorizontal="true"
         android:orientation="horizontal"
-        android:layout_marginBottom="32dp">
+        android:layout_marginBottom="@dimen/dim_baseline_times_two">
 
         <Button
             android:id="@+id/editor_quantity_decrease"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="-" />
+            android:text="@string/button_decrease_quantity" />
 
         <EditText
             android:id="@+id/editor_quantity_stocked"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="32dp"
-            android:layout_marginRight="32dp"
+            android:layout_marginLeft="@dimen/dim_baseline_times_two"
+            android:layout_marginRight="@dimen/dim_baseline_times_two"
             android:textAppearance="?android:textAppearanceLarge"
             android:textStyle="bold"
             tools:text="3" />
@@ -98,7 +98,7 @@
             android:id="@+id/editor_quantity_increase"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="+" />
+            android:text="@string/button_increase_quantity" />
 
     </LinearLayout>
 
@@ -108,8 +108,8 @@
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/editor_button_order"
             android:layout_toLeftOf="@id/editor_button_order"
-            android:layout_marginRight="24dp"
-            android:text="0" />
+            android:layout_marginRight="@dimen/dim_baseline_times_one_and_half"
+            android:text="@string/text_zero" />
 
         <TextView
             android:id="@+id/editor_order_colon"
@@ -117,9 +117,9 @@
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/editor_button_order"
             android:layout_toLeftOf="@id/editor_button_order"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="12dp"
-            android:text=":"/>
+            android:layout_marginLeft="@dimen/dim_half"
+            android:layout_marginRight="@dimen/dim_three_quarter"
+            android:text="@string/symbol_colon"/>
 
         <Button
             android:id="@+id/editor_button_order"
@@ -127,7 +127,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/editor_quantity_stocked_container"
             android:layout_centerHorizontal="true"
-            android:text="Order more" />
+            android:text="@string/button_order_more" />
 
     <Button
         android:id="@+id/editor_button_delete_product_record"
@@ -135,10 +135,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_marginBottom="16dp"
-        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="@dimen/dim_baseline_value"
+        android:layout_marginLeft="@dimen/dim_baseline_value"
         android:layout_centerHorizontal="true"
-        android:text="Delete product record" />
+        android:text="@string/button_delete_product_record" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/editor_fab"

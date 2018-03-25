@@ -4,4 +4,11 @@
 
     <!-- Common margin around the floating action buttons throughout the app -->
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="dim_three_quarter">12dp</dimen>
+    <dimen name="image_height">100dp</dimen>
+    <dimen name="dim_baseline_times_two">32dp</dimen>
+    <dimen name="dim_baseline_times_one_and_half">24dp</dimen>
+    <dimen name="dim_zero">0dp</dimen>
+    <dimen name="dim_baseline_value">16dp</dimen>
+    <dimen name="dim_half">8dp</dimen>
 </resources>

@@ -1,9 +1,7 @@
 package com.example.android.project_inventoryapp;
 
-import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.widget.CursorAdapter;
@@ -99,7 +97,7 @@ public class ProductsCursorAdapter extends CursorAdapter {
         tvName.setText(cName);
         tvQuantity.setText(R.string.quantity_abbreviation);
         tvQuantity.append(Integer.toString(cQuantity));
-        tvPrice.setText(R.string.currency_symbol_dollar_sign );
+        tvPrice.setText(R.string.symbol_dollar_sign);
         tvPrice.append(ProductDbHelper.priceDbToString(cPrice));
 
         // Set up the 'sale' button
@@ -137,13 +135,11 @@ public class ProductsCursorAdapter extends CursorAdapter {
                         return;
                     }
 
-                    // TODO: CREATE ALERTDIALOG TO ALERT USER THAT PRODUCT IS OUT OF STOCK, ASK TO ORDER MORE, & ORDER MORE?
-                    // If quantity reduced to zero, alert user and provide option to order more
+                    // If quantity reduced to zero, alert user
                     if (updatedQuantity == 0) {
                         Toast.makeText(context, R.string.message_notice_product_sold_out, Toast.LENGTH_SHORT).show();
                     }
-                } else { // Quantity is already zero
-                    // TODO: CREATE ALERTDIALOG TO ALERT USER THAT PRODUCT IS OUT OF STOCK, ASK TO ORDER MORE, & ORDER MORE?
+                } else { // Quantity is already zero, alert user
                     Toast.makeText(context, R.string.message_notice_product_sold_out, Toast.LENGTH_SHORT).show();
                 }
             }
@@ -159,55 +155,5 @@ public class ProductsCursorAdapter extends CursorAdapter {
         TextView quantity;
         TextView price;
         Button saleButton;
-    }
-
-    // TODO: FINISH THIS ONCLICKLISTENER AND THE SHOWORDERCONFIRMATIONDIALOG METHOD BELOW
-    // Create a click listener to handle the user choosing to order more product.
-    DialogInterface.OnClickListener confirmOrderButtonClickListener =
-            new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    // User clicked alert dialog button choosing to order more of the product -
-                    // set up an Intent to open product in EditorActivity, with its order functionality.
-
-//                    //Create an intent
-//                    Intent intent = new Intent(mContext,EditorActivity.class);
-//
-//                    // Construct a URI for a single database row, using the clicked item's ID
-//                    Uri uri = ContentUris.withAppendedId(ProductEntry.CONTENT_URI,cId);
-//
-//                    // Attach the URI to the intent
-//                    intent.setData(uri);
-//
-//                    // Start the new activity intent
-//                    startActivity(intent);
-
-                }
-            };
-
-    /**
-     * Show a dialog that asks the user to confirm whether they'd like to order more of the product.
-     *
-     * @param confirmButtonClickListener is the click listener for logic to execute if the user confirms
-     *                                   they want to order more of the product
-     */
-    private void showOrderConfirmationDialog(DialogInterface.OnClickListener confirmButtonClickListener) {
-        // Create an AlertDialog.Builder and set the message, and click listeners
-        // for the positive and negative buttons on the dialog.
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        builder.setMessage(R.string.message_notice_product_sold_out);
-        builder.setPositiveButton(R.string.dialog_option_order_more, confirmButtonClickListener);
-        builder.setNegativeButton(R.string.dialog_option_not_right_now, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                // User clicked the "No" button, so dismiss the dialog
-                if (dialog != null) {
-                    dialog.dismiss();
-                }
-            }
-        });
-
-        // Create and show the AlertDialog
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
     }
 }
