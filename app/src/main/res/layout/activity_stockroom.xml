@@ -20,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="Your stockroom is bare!\n\nYou should add some products!" />
+        android:text="@string/stockroom_empty_view_message" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/stockroom_fab"

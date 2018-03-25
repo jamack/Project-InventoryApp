@@ -102,23 +102,21 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/editor_quantity_to_order_container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/editor_quantity_stocked_container"
-        android:layout_centerHorizontal="true"
-        android:orientation="horizontal">
-
         <EditText
             android:id="@+id/editor_quantity_to_order"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/editor_button_order"
+            android:layout_toLeftOf="@id/editor_button_order"
+            android:layout_marginRight="24dp"
             android:text="0" />
 
         <TextView
+            android:id="@+id/editor_order_colon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/editor_button_order"
+            android:layout_toLeftOf="@id/editor_button_order"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="12dp"
             android:text=":"/>
@@ -127,9 +125,9 @@
             android:id="@+id/editor_button_order"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/editor_quantity_stocked_container"
+            android:layout_centerHorizontal="true"
             android:text="Order more" />
-
-    </LinearLayout>
 
     <Button
         android:id="@+id/editor_button_delete_product_record"

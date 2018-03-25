@@ -163,7 +163,11 @@ public class EditorActivity extends AppCompatActivity
             mQuantityStockedEditText.setHint(R.string.hint_enter_quantity_in_stock);
 
             // Adding a new product, so hide UI elements related to existing products.
-            findViewById(R.id.editor_quantity_to_order_container).setVisibility(View.GONE);
+            mDecreaseQuantityButton.setVisibility(View.GONE);
+            mIncreaseQuantityButton.setVisibility(View.GONE);
+            mOrderQuantityEditText.setVisibility(View.GONE);
+            findViewById(R.id.editor_order_colon).setVisibility(View.GONE);
+            mOrderButton.setVisibility(View.GONE);
             findViewById(R.id.editor_button_delete_product_record).setVisibility(View.GONE);
 
         }

@@ -97,7 +97,8 @@ public class ProductsCursorAdapter extends CursorAdapter {
 
         // Set data on the textviews
         tvName.setText(cName);
-        tvQuantity.setText(Integer.toString(cQuantity));
+        tvQuantity.setText(R.string.quantity_abbreviation);
+        tvQuantity.append(Integer.toString(cQuantity));
         tvPrice.setText(R.string.currency_symbol_dollar_sign );
         tvPrice.append(ProductDbHelper.priceDbToString(cPrice));
 

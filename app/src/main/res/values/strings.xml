@@ -2,61 +2,111 @@
     <string name="app_name">Project-InventoryApp</string>
     <string name="action_settings">Settings</string>
 
-    <!-- Confirmation message for successfully adding a product [CHAR LIMIT=20] -->
-    <string name="message_product_added">Product added</string>
-    <!-- Error message for failure to add product [CHAR LIMIT=20] -->
-    <string name="message_error_failed_to_add_product">Failed to add product to database</string>
+    <!-- StockroomActivity listview empty view - no product database entries to display [CHAR LIMIT=60] -->
+    <string name="stockroom_empty_view_message">Your stockroom is bare!\n\nYou should add some products!</string>
 
-    <string name="message_product_updated">Product entry updated</string>
-    <string name="message_error_failed_to_update_product">Failed to update product</string>
-
-    <string name="message_error_failed_to_delete_product">Failed to delete product record</string>
-    <string name="message_product_deleted">Product record deleted</string>
-
-
+    <!-- StockroomActivity overflow menu - add sample database entries [CHAR LIMIT=20] -->
     <string name="stockroom_overflow_insert_sample_data">Insert sample data</string>
-    <string name="stockroom_overflow_delete_all_products">Delete all products</string>
-    <string name="currency_symbol_dollar_sign">\u0024</string>
-    <string name="message_notice_product_sold_out">Product is sold out - order more?</string>
-    <string name="dialog_option_order_more">Order more</string>
-    <string name="dialog_option_not_right_now">Not right now</string>
-    <string name="message_notice_no_products_to_delete">No products to delete</string>
-    <string name="dialog_prompt_delete_all_products">Are you sure you wish to delete all product entries?</string>
-    <string name="dialog_option_delete">Delete</string>
-    <string name="dialog_option_cancel">Cancel</string>
+    <!-- Product names for sample database entries [CHAR LIMIT=30] -->
     <string name="sample_product_01_name">Acme WhamHammer Stapler</string>
     <string name="sample_product_02_name">Bob\'s Best Wackadoodle</string>
     <string name="sample_product_03_name">Smiles-n-Stuff YummyCone</string>
+
+    <!-- StockroomActivity overflow menu - delete all database entries [CHAR LIMIT=40] -->
+    <string name="stockroom_overflow_delete_all_products">Delete all products</string>
+
+    <!-- StockroomActivity - notification: no database entries to delete [CHAR LIMIT=40] -->
+    <string name="message_notice_no_products_to_delete">No products to delete</string>
+
+    <!-- AlertDialog message: confirm whether user truly wishes to delete all database entries [CHAR LIMIT=60] -->
+    <string name="dialog_prompt_delete_all_products">Are you sure you wish to delete all product entries?</string>
+    <!-- AlertDialog options for user [CHAR LIMIT=20] -->
+    <string name="dialog_option_delete">Delete</string>
+    <string name="dialog_option_cancel">Cancel</string>
+
+    <!-- AlertDialog message: alert user that product stocked quantity has been depleted, ask to order more [CHAR LIMIT=40] -->
+    <string name="message_notice_product_sold_out">Product is sold out - order more?</string>
+    <!-- AlertDialog options for user [CHAR LIMIT=20] -->
+    <string name="dialog_option_order_more">Order more</string>
+    <string name="dialog_option_not_right_now">Not right now</string>
+
+    <!-- Text to show for the dollar sign symbol ($) [CHAR LIMIT=2] -->
+    <string name="currency_symbol_dollar_sign">\u0024</string>
+    <!-- Text to show for quantity abbreviation (Qty: ) [CHAR LIMIT=6] -->
+    <string name="quantity_abbreviation">Qty:\u0020</string>
+    <!-- Text to show for zero (0) [CHAR LIMIT=6] -->
+    <string name="text_zero">0</string>
+
+    <!-- EditorActivity actionbar titles - set depending on which mode activity is opened in [CHAR LIMIT=40] -->
     <string name="activity_title_edit_product">Edit Product</string>
     <string name="activity_title_add_product">Add Product</string>
+
+    <!-- EditorActivity - 'Add Product' EditText hints [CHAR LIMIT=60] -->
     <string name="hint_enter_name">Enter product name</string>
-    <string name="hint_enter_price">Enter product price (eg: 14.95)</string>
-    <string name="hint_enter_quantity_in_stock">Enter current quantity (eg: 20</string>
-    <string name="message_error_invalid_entry_quantity">Invalid quantity input - please try again</string>
-    <string name="message_error_negative_quantity">Cannot order a negative quantity</string>
-    <string name="message_notice_choose_quantity">Please choose quantity to order</string>
-    <string name="email_order_subject_line">Purchase Order:\u0020</string>
-    <string name="email_order_body_1of3">Hello,\n\nWe wish to purchase\u0020</string>
-    <string name="email_order_body_2of3">\u0020more of your company\'s\u0020</string>
-    <string name="email_order_body_3of3">\u0020product.</string>
-    <string name="message_error_no_app_for_email">Cannot locate an appropriate application for sending order</string>
-    <string name="text_zero">0</string>
+    <string name="hint_enter_price">Enter product price\n(eg: 14.95)</string>
+    <string name="hint_enter_quantity_in_stock">Enter current quantity\n(eg: 20)</string>
+
+    <!-- Error messages for failure to select and add a product image [CHAR LIMIT=40] -->
+    <string name="message_error_failed_to_add_image">Failed to add image</string>
+    <string name="message_error_failed_to_pick_image">Unable to perform image selection</string>
+
+    <!-- Confirmation message for successfully adding a product [CHAR LIMIT=40] -->
+    <string name="message_product_added">Product added</string>
+    <!-- Error message for failure to add product [CHAR LIMIT=40] -->
+    <string name="message_error_failed_to_add_product">Failed to add product to database</string>
+
+    <!-- Confirmation message for successfully updating a product [CHAR LIMIT=40] -->
+    <string name="message_product_updated">Product entry updated</string>
+    <!-- Error message for failure to add product [CHAR LIMIT=40] -->
+    <string name="message_error_failed_to_update_product">Failed to update product</string>
+
+    <!-- Confirmation message for successfully deleting a product [CHAR LIMIT=40] -->
+    <string name="message_product_deleted">Product record deleted</string>
+    <!-- Error message for failure to delete product [CHAR LIMIT=40] -->
+    <string name="message_error_failed_to_delete_product">Failed to delete product record</string>
+
+    <!-- EditorActivity - notification: trying to save without having made any changes [CHAR LIMIT=40] -->
     <string name="message_notice_no_product_data_to_save">No product info to save</string>
     <string name="message_notice_no_product_edits_to_save">Make desired edit(s) before saving</string>
+
+    <!-- EditorActivity - notification: trying to save without necessary fields [CHAR LIMIT=40] -->
     <string name="message_notice_name_required">Product name required</string>
     <string name="message_notice_price_required">Product price required</string>
     <string name="message_notice_valid_price_required">Valid price required. (e.g. 14.95)</string>
     <string name="message_notice_stocked_quantity_required">Stocked quantity required</string>
+
+    <!-- EditorActivity - notification: trying to order invalid quantities [CHAR LIMIT=40] -->
+    <string name="message_notice_choose_quantity">Please choose quantity to order</string>
+    <string name="message_error_negative_quantity">Cannot order a negative quantity</string>
+
+    <!-- Data validation notifications [CHAR LIMIT=40] -->
     <string name="message_notice_valid_quantity_required">Invalid quantity input - please try again</string>
-    <string name="message_error_failed_to_add_image">Failed to add image</string>
-    <string name="message_error_failed_to_pick_image">Unable to perform image selection</string>
+    <string name="message_error_invalid_entry_quantity">Invalid quantity input - please try again</string>
+
+    <!-- AlertDialog message: confirm whether user truly wishes to order more product [CHAR LIMIT=60] -->
     <string name="dialog_prompt_confirm_order">Are you sure you want to place this order?</string>
+    <!-- AlertDialog options for user [CHAR LIMIT=20] -->
     <string name="dialog_option_place_order">Place order</string>
+    <!-- Other option - 'Not right now' - is listed elsewhere as 'dialog_option_not_right_now' -->
+
+    <!-- Text for populating email to order more product [CHAR LIMIT=60] -->
+    <string name="email_order_subject_line">Purchase Order:\u0020</string>
+    <string name="email_order_body_1of3">Hello,\n\nWe wish to purchase\u0020</string>
+    <string name="email_order_body_2of3">\u0020more of your company\'s\u0020</string>
+    <string name="email_order_body_3of3">\u0020product.</string>
+    <!-- Error message if email intent cannot be handled by any apps on the device [CHAR LIMIT=60] -->
+    <string name="message_error_no_app_for_email">Cannot locate an appropriate application for sending order</string>
+
+    <!-- AlertDialog message: confirm whether user truly wishes to delete this product database entry [CHAR LIMIT=60] -->
     <string name="dialog_prompt_delete_product_record">Are you sure you want to delete this product record?</string>
+    <!-- AlertDialog options for user [CHAR LIMIT=20] -->
     <string name="dialog_option_delete_record">Delete record</string>
     <string name="dialog_option_retain_record">Retain record</string>
+
+    <!-- AlertDialog message: confirm whether user truly wishes to navigate away and discard changes [CHAR LIMIT=60] -->
+    <string name="dialog_prompt_discard_unsaved_changes">Discard your changes and quit editing?</string>
+    <!-- AlertDialog options for user [CHAR LIMIT=20] -->
     <string name="dialog_option_discard_changes">Discard</string>
     <string name="dialog_option_keep_editing">Keep editing</string>
-    <string name="dialog_prompt_discard_unsaved_changes">Discard your changes and quit editing?</string>
-
+    
 </resources>
