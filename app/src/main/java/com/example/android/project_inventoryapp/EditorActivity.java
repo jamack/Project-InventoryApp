@@ -477,9 +477,12 @@ public class EditorActivity extends AppCompatActivity
         // Create new ContentValues object to hold user input
         ContentValues values = new ContentValues();
 
-        // Check whether an image has been set for the product
-        if (mImageBitmap != null) {
-
+        // Check whether an image has been set for the product.
+        // Product image is required.
+        if (mImageBitmap == null) {
+            Toast.makeText(getApplicationContext(), R.string.message_notice_image_required,Toast.LENGTH_SHORT).show();
+            return null;
+        } else {
             // Convert image bitmap into byte array that can be saved into database's blob data type,
             // using helper method in database helper class.
             byte[] imageByteArray = ProductDbHelper.getBytes(mImageBitmap);
