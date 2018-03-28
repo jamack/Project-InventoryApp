@@ -35,8 +35,7 @@
         android:layout_alignWithParentIfMissing="true"
         android:layout_below="@id/editor_image"
         android:layout_centerHorizontal="true"
-        android:textAppearance="?android:textAppearanceLarge"
-        android:textStyle="bold"
+        android:textAppearance="@style/?android:textAppearanceLarge"
         tools:text="Acme WhamHammer Stapler" />
 
     <LinearLayout
